@@ -1,0 +1,9 @@
+sudo: false
+language: elixir
+elixir:
+  - 1.0.4
+services:
+  - elasticsearch
+script: "mix test"
+notifications:
+  email: werbitzky@gmail.com
