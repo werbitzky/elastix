@@ -1,0 +1,2 @@
+defmodule Elastix do
+end
