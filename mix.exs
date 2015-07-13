@@ -7,10 +7,8 @@ defmodule Elastix.Mixfile do
     [app: :elastix,
      version: @version,
      elixir: "~> 1.0",
-     contributors: ["El Werbitzky"],
-     description: "Simple Elastic Client",
-     source_url: "https://github.com/werbitzky/elastix",
-     homepage_url: "https://github.com/werbitzky/elastix",
+     description: "A simple Elastic REST client written in Elixir.",
+     package: package,
      docs: [source_ref: "v#{@version}", main: "overview"],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -39,5 +37,12 @@ defmodule Elastix.Mixfile do
      {:poison, "~> 1.4"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
      {:httpotion, "~> 2.1.0"}]
+  end
+  
+  defp package do
+    [files: ["lib", "mix.exs", "README.md"],
+      contributors: ["El Werbitzky"],
+      licenses: ["WTFPL 2"],
+      links: %{"GitHub" => "https://github.com/werbitzky/elastix"}]
   end
 end
