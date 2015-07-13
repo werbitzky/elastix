@@ -5,7 +5,7 @@ defmodule Elastix.Index do
   
   @doc false
   def create(name, data) do
-    HTTP.post(make_path(name), data)
+    HTTP.post(make_path(name), [body: Poison.encode!(data)])
   end
   
   @doc false
