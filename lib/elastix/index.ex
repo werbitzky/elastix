@@ -28,7 +28,8 @@ defmodule Elastix.Index do
     end
   end
   
+  @doc false
   def make_path(name) do
-    "/" <> name
+    "/#{name}"
   end
 end
