@@ -24,7 +24,7 @@ I will try and provide documentation and examples for all of them with time, for
 
 ## First example with Ecto
 
-sample configuration in your ```config/config.ex``` file with an sample application named ```ShopApi```:
+sample configuration in your ```config/config.ex``` file with a sample application named ```ShopApi```:
 
 ```elixir
 config :shop_api, ShopApi,
