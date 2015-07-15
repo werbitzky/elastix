@@ -15,10 +15,10 @@ When needed, the payload can be provided as an Elixir Map, which is internally c
 
 Elastix has *3 main modules* and one *utility module*, that can be used, if the call/feature you want is not implemented (yet). However – please open issues or provide pull requests so I can improve the software for everybody. The modules are:
 
-* [Elastix.Index](blob/master/lib/elastix/index.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
-* [Elastix.Document](blob/master/lib/elastix/document.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
-* [Elastix.Search](blob/master/lib/elastix/search.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
-* and [Elastix.HTTP](blob/master/lib/elastix/http.ex) – a thin [HTTPotion](https://github.com/myfreeweb/httpotion) wrapper
+* [Elastix.Index](lib/elastix/index.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
+* [Elastix.Document](lib/elastix/document.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
+* [Elastix.Search](lib/elastix/search.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
+* and [Elastix.HTTP](lib/elastix/http.ex) – a thin [HTTPotion](https://github.com/myfreeweb/httpotion) wrapper
 
 I will try and provide documentation and examples for all of them with time, for now just consult the source code.
 
