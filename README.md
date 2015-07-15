@@ -48,7 +48,7 @@ Index.create(Application.config(:elastic_index_name), %{})
 
 ```
 
-the create a module, that handles indexing and/or searching your ecto model (maybe I'll provide a behaviour for that in future):
+then create a module, that handles indexing and/or searching your ecto model (maybe I'll provide a behaviour for that in future):
 
 ```elixir
 defmodule ShopApi.ProductElastix do
