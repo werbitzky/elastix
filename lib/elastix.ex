@@ -3,8 +3,10 @@ defmodule Elastix do
   A module that provides a simple Interface to communicate with an Elastic server via REST.
   """
   
-  if !Application.get_env(:elastix, Elastix), do: raise "Elastix is not configured"
-  if !Dict.get(Application.get_env(:elastix, Elastix), :elastic_url), do: raise "Elastix requires an :elastic_url"
+  @config Application.get_env(:elastix, Elastix)
+  
+  if !@config, do: raise "Elastix is not configured"
+  if !Dict.get(@config, :elastic_url), do: raise "Elastix requires an :elastic_url"
   
   @doc false
   def start do
@@ -12,7 +14,7 @@ defmodule Elastix do
   end
 
   @doc false
-  def config, do: Application.get_env(:elastix, Elastix)
+  def config, do: @config
   @doc false
   def config(key), do: Dict.get(config, key)
   @doc false
