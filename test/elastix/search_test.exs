@@ -1,18 +1,20 @@
-defmodule ElastixSearchTest do
+defmodule Elastix.SearchTest do
   use ExUnit.Case
   alias Elastix.Search
   alias Elastix.Index
   alias Elastix.Document
 
+  @test_index Elastix.config(:test_index)
+  
   setup do
-    assert Index.delete("_all").status_code == 200
+    Index.delete(@test_index)
     
     :ok
   end
   
   test "make_path should make path from id and url" do
-    path = Search.make_path("index_name", ["tweet", "product"], [ttl: "1d", timeout: 123])
-    assert path == "/index_name/tweet,product/_search?ttl=1d&timeout=123"
+    path = Search.make_path(@test_index, ["tweet", "product"], [ttl: "1d", timeout: 123])
+    assert path == "/#{@test_index}/tweet,product/_search?ttl=1d&timeout=123"
   end
   
   test "search should return with status 200" do
@@ -22,14 +24,14 @@ defmodule ElastixSearchTest do
       message: "trying out Elasticsearch"
     }
         
-    response = Document.index "index_name", "message", 1, data, [refresh: true]
+    response = Document.index @test_index, "message", 1, data, [refresh: true]
     
     data = %{
       query: %{
         term: %{ user: "werbitzky" }
       }
     }
-    response = Search.search "index_name", [], data
+    response = Search.search @test_index, [], data
         
     assert response.status_code == 200
   end

@@ -1,4 +1,4 @@
-defmodule ElastixHTTPTest do
+defmodule Elastix.HTTPTest do
   use ExUnit.Case
   alias Elastix.HTTP
 
@@ -7,18 +7,22 @@ defmodule ElastixHTTPTest do
   end
   
   test "get should respond with 200" do
-    assert HTTP.get("").status_code == 200
+    {_, response} = HTTP.get("", [])
+    assert response.status_code == 200
   end
   
   test "post should respond with 400" do
-    assert HTTP.post("").status_code == 400
+    {_, response} = HTTP.post("", [])
+    assert response.status_code == 400
   end
   
   test "put should respond with 400" do
-    assert HTTP.put("").status_code == 400
+    {_, response} = HTTP.put("", [])
+    assert response.status_code == 400
   end
   
   test "delete should respond with 400" do
-    assert HTTP.delete("").status_code == 400
+    {_, response} = HTTP.delete("", [])
+    assert response.status_code == 400
   end
 end

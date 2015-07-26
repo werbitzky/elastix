@@ -1,7 +1,7 @@
 defmodule Elastix.HTTP do
   @moduledoc """
   """
-  use HTTPotion.Base
+  use HTTPoison.Base
   
   @doc false
   def process_url(path) do

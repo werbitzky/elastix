@@ -1,7 +1,7 @@
 defmodule Elastix.Mixfile do
   use Mix.Project
 
-  @version "0.0.4"
+  @version "0.0.5"
 
   def project do
     [app: :elastix,
@@ -19,7 +19,7 @@ defmodule Elastix.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :httpotion]]
+    [applications: [:logger, :httpoison]]
   end
 
   # Dependencies can be Hex packages:
@@ -35,8 +35,7 @@ defmodule Elastix.Mixfile do
     [{:earmark, "~> 0.1", only: :dev},
      {:ex_doc, "~> 0.7", only: :dev},
      {:poison, "~> 1.4"},
-     {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
-     {:httpotion, "~> 2.1.0"}]
+     {:httpoison, "0.7.0"}]
   end
   
   defp package do

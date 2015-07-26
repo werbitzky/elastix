@@ -5,22 +5,22 @@ defmodule Elastix.Index do
   
   @doc false
   def create(name, data) do
-    HTTP.post(make_path(name), [body: Poison.encode!(data)])
+    process_response(HTTP.post(make_path(name), Poison.encode!(data)))
   end
   
   @doc false
   def delete(name) do
-    HTTP.delete(make_path(name))
+    process_response(HTTP.delete(make_path(name), []))
   end
   
   @doc false
   def get(name) do
-    HTTP.get(make_path(name))
+    process_response(HTTP.get(make_path(name), []))
   end
   
   @doc false
   def exists?(name) do
-    request = HTTP.head(make_path(name))
+    request = process_response(HTTP.head(make_path(name), []))
     
     case request.status_code do
       200 -> true
@@ -31,5 +31,11 @@ defmodule Elastix.Index do
   @doc false
   def make_path(name) do
     "/#{name}"
+  end
+  
+  @doc false
+  defp process_response(response) do
+    {_, response} = response
+    response
   end
 end

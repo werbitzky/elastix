@@ -7,7 +7,7 @@ A simple Elastic REST client written in Elixir.
 * [Official Elastic Website](https://www.elastic.co)
 * [and latest docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 
-This library talks to the Elastic(search) server through the HTTP/REST/JSON API. Its methods almost always return a [HTTPotion](https://github.com/myfreeweb/httpotion) request object.
+This library talks to the Elastic(search) server through the HTTP/REST/JSON API. Its methods almost always return a [HTTPoison](https://github.com/edgurgel/httpoison) request object.
 
 When needed, the payload can be provided as an Elixir Map, which is internally converted to JSON. The library does not assume anything else regarding the payload and also does not (and will never) provide a magic DSL to generate the payload. That way users can directly manipulate the API data, that is sent to the Elastic server.
 
@@ -18,7 +18,7 @@ Elastix has *3 main modules* and one *utility module*, that can be used, if the 
 * [Elastix.Index](lib/elastix/index.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
 * [Elastix.Document](lib/elastix/document.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
 * [Elastix.Search](lib/elastix/search.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
-* and [Elastix.HTTP](lib/elastix/http.ex) – a thin [HTTPotion](https://github.com/myfreeweb/httpotion) wrapper
+* and [Elastix.HTTP](lib/elastix/http.ex) – a thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper
 
 I will try and provide documentation and examples for all of them with time, for now just consult the source code.
 
