@@ -11,7 +11,7 @@ defmodule Elastix.HTTP do
   @doc false
   def process_request_headers(headers) do
     headers
-    |> Dict.put(:"Content-Type", "application/json")
+    |> Dict.put(:"Content-Type", "application/json; charset=UTF-8")
   end
 
   @doc false
