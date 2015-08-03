@@ -44,7 +44,7 @@ Elastix.start()
 create the index somewhere
 
 ```elixir
-Index.create(Application.config(:elastic_index_name), %{})
+Elastix.Index.create(Application.config(:elastic_index_name), %{})
 
 ```
 
