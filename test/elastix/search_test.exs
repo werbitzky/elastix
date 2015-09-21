@@ -24,7 +24,7 @@ defmodule Elastix.SearchTest do
       message: "trying out Elasticsearch"
     }
 
-    response = Document.index @test_index, "message", 1, data, [refresh: true]
+    Document.index @test_index, "message", 1, data, [refresh: true]
 
     data = %{
       query: %{
