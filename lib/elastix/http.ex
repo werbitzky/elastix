@@ -2,7 +2,7 @@ defmodule Elastix.HTTP do
   @moduledoc """
   """
   use HTTPoison.Base
-  
+
   @doc false
   def process_url(path) do
     host <> path
@@ -22,7 +22,7 @@ defmodule Elastix.HTTP do
       {:ok, decoded} -> decoded
     end
   end
-  
+
   @doc false
   def host, do: Elastix.config(:elastic_url)
 end
