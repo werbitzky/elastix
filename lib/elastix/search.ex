@@ -7,6 +7,7 @@ defmodule Elastix.Search do
   def search(index, types, data) do
     search(index, types, data, [])
   end
+
   @doc false
   def search(index, types, data, query_params) do
     path = make_path(index, types, query_params)

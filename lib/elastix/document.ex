@@ -7,6 +7,7 @@ defmodule Elastix.Document do
   def index(index_name, type_name, id, data) do
     index(index_name, type_name, id, data, [])
   end
+
   @doc false
   def index(index_name, type_name, id, data, query_params) do
     path = make_path(index_name, type_name, id, query_params)
@@ -17,6 +18,7 @@ defmodule Elastix.Document do
   def get(index_name, type_name, id) do
     get(index_name, type_name, id, [])
   end
+
   @doc false
   def get(index_name, type_name, id, query_params) do
     path = make_path(index_name, type_name, id, query_params)
@@ -30,6 +32,7 @@ defmodule Elastix.Document do
 
     process_response(HTTP.delete(path, []))
   end
+
   @doc false
   def delete(index_name, type_name, id, query_params) do
     path = make_path(index_name, type_name, id, query_params)
