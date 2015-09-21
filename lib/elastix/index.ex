@@ -34,8 +34,5 @@ defmodule Elastix.Index do
   end
 
   @doc false
-  defp process_response(response) do
-    {_, response} = response
-    response
-  end
+  defp process_response({_, response}), do: response
 end
