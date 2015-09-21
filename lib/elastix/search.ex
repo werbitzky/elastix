@@ -10,9 +10,9 @@ defmodule Elastix.Search do
 
   @doc false
   def search(index, types, data, query_params) do
-    path = make_path(index, types, query_params)
-
-    process_response(HTTP.post(path, Poison.encode!(data)))
+    make_path(index, types, query_params)
+    |> HTTP.post(Poison.encode!(data))
+    |> process_response
   end
 
   @doc false

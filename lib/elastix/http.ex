@@ -16,8 +16,7 @@ defmodule Elastix.HTTP do
 
   @doc false
   def process_response_body(body) do
-    body = to_string body
-    case Poison.decode body do
+    case body |> to_string |> Poison.decode do
       {:error, _} -> body
       {:ok, decoded} -> decoded
     end

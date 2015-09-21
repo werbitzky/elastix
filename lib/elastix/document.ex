@@ -10,8 +10,9 @@ defmodule Elastix.Document do
 
   @doc false
   def index(index_name, type_name, id, data, query_params) do
-    path = make_path(index_name, type_name, id, query_params)
-    process_response(HTTP.put(path, Poison.encode!(data)))
+    make_path(index_name, type_name, id, query_params)
+    |> HTTP.put(Poison.encode!(data))
+    |> process_response
   end
 
   @doc false
@@ -21,23 +22,23 @@ defmodule Elastix.Document do
 
   @doc false
   def get(index_name, type_name, id, query_params) do
-    path = make_path(index_name, type_name, id, query_params)
-
-    process_response(HTTP.get(path, []))
+    make_path(index_name, type_name, id, query_params)
+    |> HTTP.get
+    |> process_response
   end
 
   @doc false
   def delete(index_name, type_name, id) do
-    path = make_path(index_name, type_name, id, [])
-
-    process_response(HTTP.delete(path, []))
+    make_path(index_name, type_name, id, [])
+    |> HTTP.delete
+    |> process_response
   end
 
   @doc false
   def delete(index_name, type_name, id, query_params) do
-    path = make_path(index_name, type_name, id, query_params)
-
-    process_response(HTTP.delete(path, []))
+    make_path(index_name, type_name, id, query_params)
+    |> HTTP.delete
+    |> process_response
   end
 
   @doc false
