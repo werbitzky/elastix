@@ -7,34 +7,38 @@ defmodule Elastix.Document do
   def index(index_name, type_name, id, data) do
     index(index_name, type_name, id, data, [])
   end
+
   @doc false
   def index(index_name, type_name, id, data, query_params) do
-    path = make_path(index_name, type_name, id, query_params)
-    process_response(HTTP.put(path, Poison.encode!(data)))
+    make_path(index_name, type_name, id, query_params)
+    |> HTTP.put(Poison.encode!(data))
+    |> process_response
   end
-  
+
   @doc false
   def get(index_name, type_name, id) do
     get(index_name, type_name, id, [])
   end
+
   @doc false
   def get(index_name, type_name, id, query_params) do
-    path = make_path(index_name, type_name, id, query_params)
-    
-    process_response(HTTP.get(path, []))
+    make_path(index_name, type_name, id, query_params)
+    |> HTTP.get
+    |> process_response
   end
 
   @doc false
   def delete(index_name, type_name, id) do
-    path = make_path(index_name, type_name, id, [])
-    
-    process_response(HTTP.delete(path, []))
+    make_path(index_name, type_name, id, [])
+    |> HTTP.delete
+    |> process_response
   end
+
   @doc false
   def delete(index_name, type_name, id, query_params) do
-    path = make_path(index_name, type_name, id, query_params)
-    
-    process_response(HTTP.delete(path, []))
+    make_path(index_name, type_name, id, query_params)
+    |> HTTP.delete
+    |> process_response
   end
 
   @doc false
@@ -46,19 +50,16 @@ defmodule Elastix.Document do
       _ -> add_query_params(path, query_params)
     end
   end
-  
+
   @doc false
   defp add_query_params(path, query_params) do
     query_string = Enum.map_join query_params, "&", fn(param) ->
       "#{elem(param, 0)}=#{elem(param, 1)}"
     end
-    
+
     "#{path}?#{query_string}"
   end
-  
+
   @doc false
-  defp process_response(response) do
-    {_, response} = response
-    response
-  end
+  defp process_response({_, response}), do: response
 end

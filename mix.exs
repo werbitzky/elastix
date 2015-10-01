@@ -37,7 +37,7 @@ defmodule Elastix.Mixfile do
      {:poison, "~> 1.4"},
      {:httpoison, "0.7.0"}]
   end
-  
+
   defp package do
     [files: ["lib", "mix.exs", "README.md"],
       contributors: ["El Werbitzky"],

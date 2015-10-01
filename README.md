@@ -29,7 +29,7 @@ sample configuration in your ```config/config.ex``` file with a sample applicati
 ```elixir
 config :shop_api, ShopApi,
   elastic_index_name: "shop_api_#{Mix.env}"
-  
+
 config :elastix, Elastix,
   elastic_url: "http://127.0.0.1:9200"
 ```
@@ -52,15 +52,15 @@ then create a module, that handles indexing and/or searching your ecto model (ma
 
 ```elixir
 defmodule ShopApi.ProductElastix do
-  
+
   def index_name do
     Application.config :elastic_index_name
   end
-  
+
   def index_type do
     "product"
   end
-  
+
   def to_map(product) do
     %{
       name: product.name,
@@ -69,20 +69,20 @@ defmodule ShopApi.ProductElastix do
       updated_at: product.updated_at
     }
   end
-  
+
   def model_mod do
     ShopApi.Product
   end
-  
+
   def index(product) do
     index_data = to_map(product)
     Elastix.Document.index(index_name, index_type, product.id, index_data)
   end
-  
+
   def index_delete(product) do
     Elastix.Document.delete(index_name, index_type, product.id)
   end
-  
+
   def search(search_payload) do
     Elastix.Search.search(index_name, [index_type], search_payload)
   end
@@ -95,12 +95,12 @@ use the module in the model callbacks:
 ```elixir
 defmodule ShopApi.Product do
   use ShopApi.Web, :model
-  
+
   after_insert :index_create
   after_update :index_create
-  
+
   after_delete :index_delete
-  
+
   schema "products" do
     field :name, :string
     field :item_number, :string
@@ -113,17 +113,17 @@ defmodule ShopApi.Product do
 
   def index_create(changeset) do
     product = changeset.model
-    
+
     ShopApi.ProductElastix.index product
-    
+
     changeset
   end
-  
+
   def index_delete(changeset) do
     product = changeset.model
-    
+
     ShopApi.ProductElastix.index_delete product
-    
+
     changeset
   end
 
