@@ -2,7 +2,7 @@
 
 Improvements:
 
-  - deprecate deprecate :elastic_url configuration variable in favor of extended signature of Elastix functions by an elastc_url param
+  - deprecate :elastic_url configuration variable in favor of extended signature of Elastix functions by an elastc_url param
   - relax HTTPoison version dependency
   
 Breaking Changes:
