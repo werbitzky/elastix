@@ -40,7 +40,7 @@ defmodule Elastix.Mixfile do
 
   defp package do
     [files: ["lib", "mix.exs", "README.md"],
-      contributors: ["El Werbitzky"],
+      maintainers: ["El Werbitzky"],
       licenses: ["WTFPL 2"],
       links: %{"GitHub" => "https://github.com/werbitzky/elastix"}]
   end
