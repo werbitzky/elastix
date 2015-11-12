@@ -5,9 +5,6 @@ defmodule Elastix do
 
   @config Application.get_env(:elastix, Elastix)
 
-  if !@config, do: raise "Elastix is not configured"
-  if !Dict.get(@config, :elastic_url), do: raise "Elastix requires an :elastic_url"
-
   @doc false
   def start do
     :application.ensure_all_started(:elastix)

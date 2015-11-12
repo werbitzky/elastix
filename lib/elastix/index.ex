@@ -4,33 +4,29 @@ defmodule Elastix.Index do
   alias Elastix.HTTP
 
   @doc false
-  def create(name, data) do
-    name
-    |> make_path
+  def create(elastic_url, name, data) do
+    elastic_url <> make_path(name)
     |> HTTP.post(Poison.encode!(data))
     |> process_response
   end
 
   @doc false
-  def delete(name) do
-    name
-    |> make_path
+  def delete(elastic_url, name) do
+    elastic_url <> make_path(name)
     |> HTTP.delete
     |> process_response
   end
 
   @doc false
-  def get(name) do
-    name
-    |> make_path
+  def get(elastic_url, name) do
+    elastic_url <> make_path(name)
     |> HTTP.get
     |> process_response
   end
 
   @doc false
-  def exists?(name) do
-    request = name
-      |> make_path
+  def exists?(elastic_url, name) do
+    request = elastic_url <> make_path(name)
       |> HTTP.head
       |> process_response
 

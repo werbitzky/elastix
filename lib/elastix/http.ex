@@ -4,8 +4,8 @@ defmodule Elastix.HTTP do
   use HTTPoison.Base
 
   @doc false
-  def process_url(path) do
-    host <> path
+  def process_url(url) do
+    url
   end
 
   @doc false
@@ -21,7 +21,4 @@ defmodule Elastix.HTTP do
       {:ok, decoded} -> decoded
     end
   end
-
-  @doc false
-  def host, do: Elastix.config(:elastic_url)
 end

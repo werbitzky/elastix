@@ -4,10 +4,11 @@ defmodule Elastix.SearchTest do
   alias Elastix.Index
   alias Elastix.Document
 
+  @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
 
   setup do
-    Index.delete(@test_index)
+    Index.delete(@test_url, @test_index)
 
     :ok
   end
@@ -24,14 +25,14 @@ defmodule Elastix.SearchTest do
       message: "trying out Elasticsearch"
     }
 
-    Document.index @test_index, "message", 1, data, [refresh: true]
+    Document.index @test_url, @test_index, "message", 1, data, [refresh: true]
 
     data = %{
       query: %{
         term: %{ user: "werbitzky" }
       }
     }
-    response = Search.search @test_index, [], data
+    response = Search.search @test_url, @test_index, [], data
 
     assert response.status_code == 200
   end

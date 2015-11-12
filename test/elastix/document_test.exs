@@ -3,10 +3,11 @@ defmodule Elastix.DocumentTest do
   alias Elastix.Index
   alias Elastix.Document
 
+  @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
 
   setup do
-    Index.delete(@test_index)
+    Index.delete(@test_url, @test_index)
 
     :ok
   end
@@ -22,7 +23,7 @@ defmodule Elastix.DocumentTest do
       message: "trying out Elasticsearch"
     }
 
-    response = Document.index @test_index, "message", 1, data
+    response = Document.index @test_url, @test_index, "message", 1, data
 
     assert response.status_code == 201
     assert response.body["_id"] == "1"
@@ -32,7 +33,7 @@ defmodule Elastix.DocumentTest do
   end
 
   test "get should return 404 if not index was created" do
-    response = Document.get @test_index, "message", 1
+    response = Document.get @test_url, @test_index, "message", 1
 
     assert response.status_code == 404
   end
@@ -44,8 +45,8 @@ defmodule Elastix.DocumentTest do
       message: "trying out Elasticsearch"
     }
 
-    Document.index @test_index, "message", 1, data
-    response = Document.get @test_index, "message", 1
+    Document.index @test_url, @test_index, "message", 1, data
+    response = Document.get @test_url, @test_index, "message", 1
     body = response.body
 
     assert response.status_code == 200
@@ -61,15 +62,15 @@ defmodule Elastix.DocumentTest do
       message: "trying out Elasticsearch"
     }
 
-    Document.index @test_index, "message", 1, data
+    Document.index @test_url, @test_index, "message", 1, data
 
-    response = Document.get @test_index, "message", 1
+    response = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 200
 
-    response = Document.delete @test_index, "message", 1
+    response = Document.delete @test_url, @test_index, "message", 1
     assert response.status_code == 200
 
-    response = Document.get @test_index, "message", 1
+    response = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 404
   end
 end

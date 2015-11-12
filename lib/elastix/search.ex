@@ -4,13 +4,13 @@ defmodule Elastix.Search do
   alias Elastix.HTTP
 
   @doc false
-  def search(index, types, data) do
-    search(index, types, data, [])
+  def search(elastic_url, index, types, data) do
+    search(elastic_url, index, types, data, [])
   end
 
   @doc false
-  def search(index, types, data, query_params) do
-    make_path(index, types, query_params)
+  def search(elastic_url, index, types, data, query_params) do
+    elastic_url <> make_path(index, types, query_params)
     |> HTTP.post(Poison.encode!(data))
     |> process_response
   end
