@@ -22,6 +22,42 @@ Elastix has *3 main modules* and one *utility module*, that can be used, if the 
 
 I will try and provide documentation and examples for all of them with time, for now just consult the source code.
 
+## Simple Example
+
+start elastix application dependencies (or define it as an application dependency in ```mix.exs```):
+
+```elixir
+Elastix.start()
+
+```
+
+create the Elastic index
+
+```elixir
+Elastix.Index.create("http://127.0.0.1:9200", "sample_index_name", %{})
+
+```
+
+assuming you have a model ```product``` create a document, search, or delete
+
+```elixir
+
+index_data = %{
+  name: product.name,
+  item_number: product.item_number,
+  inserted_at: product.inserted_at,
+  updated_at: product.updated_at
+}
+
+# add some search params according to Elastic JSON API
+search_payload = %{}
+
+Elastix.Document.index("http://127.0.0.1:9200", "sample_index_name", "product", product.id, index_data)
+Elastix.Search.search("http://127.0.0.1:9200", "sample_index_name", ["product"], search_payload)
+Elastix.Document.delete("http://127.0.0.1:9200", "sample_index_name", "product", product.id)
+
+```
+
 ## License
 
 Copyright © 2015 El Werbitzky <werbitzky@gmail.com>
