@@ -45,6 +45,12 @@ assuming you have a model ```product``` create a document, search, or delete
 # Elastic Server URL
 elastic_url = "http://127.0.0.1:9200"
 
+# Elastic Index Name
+index_name = "shop_api_production"
+
+# Elastic Document Type
+doc_type = "product"
+
 index_data = %{
   name: product.name,
   item_number: product.item_number,
@@ -55,9 +61,12 @@ index_data = %{
 # add some search params according to Elastic JSON API
 search_payload = %{}
 
-Elastix.Document.index(elastic_url, "sample_index_name", "product", product.id, index_data)
-Elastix.Search.search(elastic_url, "sample_index_name", ["product"], search_payload)
-Elastix.Document.delete(elastic_url, "sample_index_name", "product", product.id)
+# which document types should be included in the search?
+search_in = [doc_type]
+
+Elastix.Document.index(elastic_url, index_name, doc_type, product.id, index_data)
+Elastix.Search.search(elastic_url, index_name, search_in, search_payload)
+Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
 
 ```
 
