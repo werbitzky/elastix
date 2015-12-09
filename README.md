@@ -42,6 +42,9 @@ assuming you have a model ```product``` create a document, search, or delete
 
 ```elixir
 
+# Elastic Server URL
+elastic_url = "http://127.0.0.1:9200"
+
 index_data = %{
   name: product.name,
   item_number: product.item_number,
@@ -52,9 +55,9 @@ index_data = %{
 # add some search params according to Elastic JSON API
 search_payload = %{}
 
-Elastix.Document.index("http://127.0.0.1:9200", "sample_index_name", "product", product.id, index_data)
-Elastix.Search.search("http://127.0.0.1:9200", "sample_index_name", ["product"], search_payload)
-Elastix.Document.delete("http://127.0.0.1:9200", "sample_index_name", "product", product.id)
+Elastix.Document.index(elastic_url, "sample_index_name", "product", product.id, index_data)
+Elastix.Search.search(elastic_url, "sample_index_name", ["product"], search_payload)
+Elastix.Document.delete(elastic_url, "sample_index_name", "product", product.id)
 
 ```
 
