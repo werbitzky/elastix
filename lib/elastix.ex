@@ -3,17 +3,13 @@ defmodule Elastix do
   A module that provides a simple Interface to communicate with an Elastic server via REST.
   """
 
-  @config Application.get_env(:elastix, Elastix)
-
   @doc false
   def start do
     :application.ensure_all_started(:elastix)
   end
 
   @doc false
-  def config, do: @config
+  def config, do: Application.get_all_env(:elastix)
   @doc false
-  def config(key), do: Dict.get(config, key)
-  @doc false
-  def config(key, default), do: Dict.get(config, key, default)
+  def config(key, default \\ nil), do: Application.get_env(:elastix, key, default) 
 end

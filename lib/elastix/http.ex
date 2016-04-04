@@ -3,6 +3,13 @@ defmodule Elastix.HTTP do
   """
   use HTTPoison.Base
 
+  @recv_timeout Elastix.config(:recv_timeout, 5_000)
+
+  def request(method, url, body \\ "", headers \\ [], options \\ []) do
+    options = Keyword.put(options, :recv_timeout, @recv_timeout)
+    super(method, url, body, headers, options)
+  end
+
   @doc false
   def process_url(url) do
     url
