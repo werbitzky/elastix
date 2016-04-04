@@ -3,6 +3,30 @@ defmodule Elastix.Document do
   """
   alias Elastix.HTTP
 
+  @doc """
+  Update a list of documents using the _bulk endpoint.
+  The `documents` structure must have an `id` field.
+  """
+  def bulk_index(elastic_url, index_name, type_name, documents) do
+    json =
+      documents
+      |> Enum.map(fn d -> bulk_document(index_name, type_name, d) end)
+      |> Enum.join("\n")
+
+    elastic_url <> make_path(index_name, type_name, "_bulk", []) 
+    |> HTTP.put(json)
+    |> process_response
+  end
+
+  defp bulk_document(index_name, index_type, doc) do
+    [
+      %{index: %{_index: index_name, _type: index_type, _id: doc.id }},
+      doc
+    ]
+    |> Enum.map(&Poison.encode!/1)
+    |> Enum.join("\n")
+  end
+
   @doc false
   def index(elastic_url, index_name, type_name, id, data) do
     index(elastic_url, index_name, type_name, id, data, [])
