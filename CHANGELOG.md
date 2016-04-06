@@ -3,7 +3,7 @@
 ### Improvements:
 
   - relax/bump up poison/httpoison versions
-  - use Application.get_env dynamically for configuration (will prevent freezing configuration during compile-time)
+  - use Application.get_env dynamically for configuration (will prevent Elastix from freezing configuration during compile-time)
 
 ## 0.1.0
 
