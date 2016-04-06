@@ -65,7 +65,7 @@
         {Credo.Check.Refactor.CondStatements},
         {Credo.Check.Refactor.FunctionArity, max_arity: 6},
         {Credo.Check.Refactor.MatchInCondition},
-        {Credo.Check.Refactor.PipeChainStart},
+        #{Credo.Check.Refactor.PipeChainStart},
         {Credo.Check.Refactor.CyclomaticComplexity},
         {Credo.Check.Refactor.NegatedConditionsInUnless},
         {Credo.Check.Refactor.NegatedConditionsWithElse},

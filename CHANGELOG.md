@@ -1,9 +1,10 @@
-## 0.2.0
+## 0.1.1
 
 ### Improvements:
 
   - relax/bump up poison/httpoison versions
   - use Application.get_env dynamically for configuration (will prevent Elastix from freezing configuration during compile-time)
+  - make code credo-conform
 
 ## 0.1.0
 

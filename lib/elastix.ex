@@ -1,6 +1,7 @@
 defmodule Elastix do
   @moduledoc """
-  A module that provides a simple Interface to communicate with an Elastic server via REST.
+  A module that provides a simple Interface to communicate with
+  an Elastic server via REST.
   """
 
   @doc false
