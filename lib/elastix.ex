@@ -10,9 +10,7 @@ defmodule Elastix do
   end
 
   @doc false
-  def config, do: Application.get_env(:elastix, Elastix)
+  def config, do: Application.get_all_env(:elastix)
   @doc false
-  def config(key), do: Dict.get(config, key)
-  @doc false
-  def config(key, default), do: Dict.get(config, key, default)
+  def config(key, default \\ nil), do: Application.get_env(:elastix, key, default)
 end
