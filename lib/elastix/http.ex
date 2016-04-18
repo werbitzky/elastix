@@ -10,8 +10,16 @@ defmodule Elastix.HTTP do
 
   @doc false
   def process_request_headers(headers) do
-    headers
+    headers = headers
     |> Dict.put(:"Content-Type", "application/json; charset=UTF-8")
+
+    # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
+    username = Elastix.config(:username)
+    password = Elastix.config(:password)
+    if username && password do
+      headers = Dict.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
+    end
+    headers
   end
 
   @doc false
