@@ -37,6 +37,13 @@ defmodule Elastix.Index do
   end
 
   @doc false
+  def refresh(elastic_url, name) do
+    elastic_url <> make_path(name) <> make_path("_refresh")
+    |> HTTP.post("")
+    |> process_response
+  end
+
+  @doc false
   def make_path(name) do
     "/#{name}"
   end
