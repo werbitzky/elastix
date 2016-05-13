@@ -70,6 +70,16 @@ Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
 
 ```
 
+## Configuration
+You can pass options to the JSON decoder ([poison](https://github.com/devinus/poison)) by setting the `poison_options`
+key in your `config/config.exs`:
+
+```elixir
+config :elastix, :poison_options, [keys: :atoms]
+```
+
+The above for example will lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys.
+
 ## License
 
 Copyright © 2015 El Werbitzky <werbitzky@gmail.com>
