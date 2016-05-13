@@ -28,4 +28,21 @@ defmodule Elastix.HTTPTest do
     {_, response} = HTTP.delete(@test_url, [])
     assert response.status_code == 400
   end
+
+  test "process_response_body should parse the json body into a map" do
+    body = "{\"some\":\"json\"}"
+    assert HTTP.process_response_body(body) == %{"some" => "json"}
+  end
+
+  test "process_response_body returns the raw body if it cannot be parsed as json" do
+    body = "no_json"
+    assert HTTP.process_response_body(body) == body
+  end
+
+  test "process_response_body parsed the body into an atom key map if configured" do
+    body = "{\"some\":\"json\"}"
+    Application.put_env(:elastix, :poison_options, [keys: :atoms])
+    assert HTTP.process_response_body(body) == %{some: "json"}
+    Application.delete_env(:elastix, :poison_options)
+  end
 end
