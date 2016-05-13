@@ -47,4 +47,13 @@ defmodule Elastix.IndexTest do
 
     assert index.body[@test_index]
   end
+
+  test "refresh of uncreated index should respond with 404" do
+    assert Index.refresh(@test_url, @test_index).status_code == 404
+  end
+
+  test "refresh of existing index should respond with 200" do
+    Index.create(@test_url, @test_index, %{}).status_code
+    assert Index.refresh(@test_url, @test_index).status_code == 200
+  end
 end
