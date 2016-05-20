@@ -31,6 +31,6 @@ defmodule Elastix.HTTP do
   end
 
   defp poison_options do
-    Application.get_env(:elastix, :poison_options, [])
+    Elastix.config(:poison_options, [])
   end
 end
