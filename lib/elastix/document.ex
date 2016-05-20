@@ -16,6 +16,18 @@ defmodule Elastix.Document do
   end
 
   @doc false
+  def index_new(elastic_url, index_name, type_name, data) do
+    index_new(elastic_url, index_name, type_name, data, [])
+  end
+
+  @doc false
+  def index_new(elastic_url, index_name, type_name, data, query_params) do
+    elastic_url <> make_path(index_name, type_name, query_params)
+    |> HTTP.post(Poison.encode!(data))
+    |> process_response
+  end
+
+  @doc false
   def get(elastic_url, index_name, type_name, id) do
     get(elastic_url, index_name, type_name, id, [])
   end
@@ -42,7 +54,7 @@ defmodule Elastix.Document do
   end
 
   @doc false
-  def make_path(index_name, type_name, id, query_params) do
+  def make_path(index_name, type_name, id \\ nil, query_params) do
     path = "/#{index_name}/#{type_name}/#{id}"
 
     case query_params do
