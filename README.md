@@ -70,18 +70,22 @@ Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
 
 ```
 
-## Shield Support
+## Configuration
 
-To use basic auth/shield, configure elastix this way:
+You can pass options to the JSON decoder ([poison](https://github.com/devinus/poison)) by setting the `poison_options`
+key in your `config/config.exs` and optionally use shield:
 
 ```elixir
-
 config :elastix,
+  poison_options: [keys: :atoms],
   shield: true,
   username: "username",
   password: "password"
-
 ```
+
+The above for example will lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
+
+Also the above example also uses shield for authentication: https://www.elastic.co/products/shield
 
 ## License
 
