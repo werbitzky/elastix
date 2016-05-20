@@ -5,6 +5,12 @@ defmodule Elastix.DocumentTest do
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
+  @data %{
+    user: "örelbörel",
+    post_date: "2009-11-15T14:12:12",
+    message: "trying out Elasticsearch"
+  }
+
 
   setup do
     Index.delete(@test_url, @test_index)
@@ -17,16 +23,20 @@ defmodule Elastix.DocumentTest do
   end
 
   test "index should create and index with data" do
-    data = %{
-      user: "örelbörel",
-      post_date: "2009-11-15T14:12:12",
-      message: "trying out Elasticsearch"
-    }
-
-    response = Document.index @test_url, @test_index, "message", 1, data
+    response = Document.index @test_url, @test_index, "message", 1, @data
 
     assert response.status_code == 201
     assert response.body["_id"] == "1"
+    assert response.body["_index"] == @test_index
+    assert response.body["_type"] == "message"
+    assert response.body["created"] == true
+  end
+
+  test "index_new should index data without an id" do
+    response = Document.index_new @test_url, @test_index, "message", @data
+
+    assert response.status_code == 201
+    assert response.body["_id"]
     assert response.body["_index"] == @test_index
     assert response.body["_type"] == "message"
     assert response.body["created"] == true
@@ -39,13 +49,7 @@ defmodule Elastix.DocumentTest do
   end
 
   test "get should return data with 200 after index" do
-    data = %{
-      user: "örelbörel",
-      post_date: "2009-11-15T14:12:12",
-      message: "trying out Elasticsearch"
-    }
-
-    Document.index @test_url, @test_index, "message", 1, data
+    Document.index @test_url, @test_index, "message", 1, @data
     response = Document.get @test_url, @test_index, "message", 1
     body = response.body
 
@@ -56,13 +60,7 @@ defmodule Elastix.DocumentTest do
   end
 
   test "delete should delete created index" do
-    data = %{
-      user: "werbitzky",
-      post_date: "2009-11-15T14:12:12",
-      message: "trying out Elasticsearch"
-    }
-
-    Document.index @test_url, @test_index, "message", 1, data
+    Document.index @test_url, @test_index, "message", 1, @data
 
     response = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 200
