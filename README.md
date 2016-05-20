@@ -72,8 +72,11 @@ Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
 
 ## Configuration
 
-You can pass options to the JSON decoder ([poison](https://github.com/devinus/poison)) by setting the `poison_options`
-key in your `config/config.exs` and optionally use shield:
+Currently we can
+  * pass options to the JSON decoder used by Elastix ([poison](https://github.com/devinus/poison))
+  * optionally use shield for authentication ([shield](https://www.elastic.co/products/shield))
+
+by setting the respective keys in your `config/config.exs`
 
 ```elixir
 config :elastix,
@@ -83,9 +86,9 @@ config :elastix,
   password: "password"
 ```
 
-The above for example will lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
-
-Also the above example also uses shield for authentication: https://www.elastic.co/products/shield
+The above for example will
+  * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
+  * use shield for authentication
 
 ## License
 
