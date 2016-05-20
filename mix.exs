@@ -1,13 +1,13 @@
 defmodule Elastix.Mixfile do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.2.0"
 
   def project do
     [app: :elastix,
      version: @version,
      elixir: "~> 1.0",
-     description: "A simple Elastic REST client written in Elixir.",
+     description: "A simple Elasticsearch REST client written in Elixir.",
      package: package,
      docs: [source_ref: "v#{@version}", main: "overview"],
      build_embedded: Mix.env == :prod,

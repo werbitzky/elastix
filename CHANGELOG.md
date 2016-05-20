@@ -1,3 +1,12 @@
+## 0.2.0
+
+### Improvements:
+
+  - add support for index_new (@manukall)
+  - add support for poison options (@manukall)
+  - add support for index refresh (@manukall)
+  - add shield support (@vdaniuk)
+
 ## 0.1.1
 
 ### Improvements:
