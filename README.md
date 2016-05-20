@@ -70,6 +70,19 @@ Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
 
 ```
 
+## Shield Support
+
+To use basic auth/shield, configure elastix this way:
+
+```elixir
+
+config :elastix,
+  shield: true,
+  username: "username",
+  password: "password"
+
+```
+
 ## License
 
 Copyright © 2015 El Werbitzky <werbitzky@gmail.com>

@@ -16,7 +16,7 @@ defmodule Elastix.HTTP do
     # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
     username = Elastix.config(:username)
     password = Elastix.config(:password)
-    if username && password do
+    if Elastix.config(:shield) do
       headers = Dict.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
     end
     headers
