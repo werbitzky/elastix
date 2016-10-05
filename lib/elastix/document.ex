@@ -54,16 +54,16 @@ defmodule Elastix.Document do
   end
 
   @doc "Sends a bulk update request for the given list of documents. Note: each document must contain an `_id` field."
-  def bulk_update(elastic_url, index_name, type_name, documents, doc_options \\ %{}) do
+  def bulk_update(elastic_url, index_name, type_name, documents, doc_options \\ %{}, update_options \\ %{}) do
     elastic_url <> make_bulk_path(index_name, type_name)
-    |> HTTP.post(bulk_update_wrap(documents, doc_options))
+    |> HTTP.post(bulk_update_wrap(documents, doc_options, update_options))
     |> process_response
   end
 
   @doc false
-  def bulk_update_wrap(documents, doc_options \\ %{}) do
+  def bulk_update_wrap(documents, doc_options \\ %{}, update_options \\ %{}) do
     Enum.reduce(documents, "", fn(doc, payload) ->
-      action = Poison.encode!(%{"update": %{"_id": doc["_id"] || doc[:_id]}}) <> "\n"
+      action = Poison.encode!(%{"update": Map.merge(%{"_id": doc["_id"] || doc[:_id]}, update_options)}) <> "\n"
       doc = Map.delete(doc, "_id") |> Map.delete(:_id)
       wrapped_doc = Poison.encode!(Map.merge(%{"doc": doc}, doc_options)) <> "\n"
 
