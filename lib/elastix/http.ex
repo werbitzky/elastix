@@ -9,18 +9,34 @@ defmodule Elastix.HTTP do
   end
 
   @doc false
-  def process_request_headers(headers) do
+  def request(method, url, body \\ "", headers \\ [], options \\ []) do
+    url =
+    if Keyword.has_key?(options, :params) do
+      url <> "?" <> URI.encode_query(options[:params])
+    else
+      url
+    end
+    url = process_url(to_string(url))
+    body = process_request_body(body)
+
     headers = headers
     |> Dict.put(:"Content-Type", "application/json; charset=UTF-8")
 
     # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
     username = Elastix.config(:username)
     password = Elastix.config(:password)
-    if Elastix.config(:shield) do
-      headers = Dict.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
+    headers = cond do
+      Elastix.config(:shield) ->
+        Dict.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
+      Elastix.config(:custom_headers) ->
+        Elastix.config(:custom_headers).call(%{method: method, url: url,body: body, headers: headers, options: options})
+      true ->
+        headers
     end
-    headers
+
+    HTTPoison.Base.request(__MODULE__, method, url, body, headers, options, &process_status_code/1, &process_headers/1, &process_response_body/1)
   end
+
 
   @doc false
   def process_response_body(body) do
