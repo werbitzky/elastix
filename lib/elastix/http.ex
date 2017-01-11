@@ -20,7 +20,7 @@ defmodule Elastix.HTTP do
     body = process_request_body(body)
 
     headers = headers
-    |> Dict.put(:"Content-Type", "application/json; charset=UTF-8")
+    |> Dict.put_new(:"Content-Type", "application/json; charset=UTF-8")
 
     # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
     username = Elastix.config(:username)
