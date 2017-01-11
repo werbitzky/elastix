@@ -20,14 +20,14 @@ defmodule Elastix.HTTP do
     body = process_request_body(body)
 
     headers = headers
-    |> Dict.put_new(:"Content-Type", "application/json; charset=UTF-8")
+    |> Keyword.put_new(:"Content-Type", "application/json; charset=UTF-8")
 
     # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
     username = Elastix.config(:username)
     password = Elastix.config(:password)
     headers = cond do
       Elastix.config(:shield) ->
-        Dict.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
+        Keyword.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
       Elastix.config(:custom_headers) ->
         Elastix.config(:custom_headers).call(%{method: method, url: url,body: body, headers: headers, options: options})
       true ->
@@ -40,7 +40,7 @@ defmodule Elastix.HTTP do
 
   @doc false
   def process_response_body(body) do
-    case body |> to_string |> Poison.decode(poison_options) do
+    case body |> to_string |> Poison.decode(poison_options()) do
       {:error, _} -> body
       {:ok, decoded} -> decoded
     end

@@ -8,11 +8,11 @@ defmodule Elastix.Mixfile do
      version: @version,
      elixir: "~> 1.0",
      description: "A simple Elasticsearch REST client written in Elixir.",
-     package: package,
+     package: package(),
      docs: [source_ref: "v#{@version}", main: "overview"],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application

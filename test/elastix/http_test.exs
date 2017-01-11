@@ -3,7 +3,6 @@ defmodule Elastix.HTTPTest do
   alias Elastix.HTTP
 
   @test_url Elastix.config(:test_url)
-  @test_index Elastix.config(:test_index)
 
   test "process_url should concat with path" do
     assert HTTP.process_url("http://127.0.0.1:9200/some_path") == "http://127.0.0.1:9200/some_path"
