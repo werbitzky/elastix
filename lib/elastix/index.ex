@@ -6,7 +6,7 @@ defmodule Elastix.Index do
   @doc false
   def create(elastic_url, name, data) do
     elastic_url <> make_path(name)
-    |> HTTP.post(Poison.encode!(data))
+    |> HTTP.put(Poison.encode!(data))
     |> process_response
   end
 
