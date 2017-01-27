@@ -34,6 +34,7 @@ defmodule Elastix.HTTP do
         headers
     end
 
+    options = Keyword.merge(default_httpoison_options(), options)
     HTTPoison.Base.request(__MODULE__, method, url, body, headers, options, &process_status_code/1, &process_headers/1, &process_response_body/1)
   end
 
@@ -48,5 +49,9 @@ defmodule Elastix.HTTP do
 
   defp poison_options do
     Elastix.config(:poison_options, [])
+  end
+
+  defp default_httpoison_options do
+    Elastix.config(:httpoison_options, [])
   end
 end
