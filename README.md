@@ -58,12 +58,23 @@ index_data = %{
   updated_at: product.updated_at
 }
 
+# Add mapping
+mapping = %{
+  properties: %{
+    name: %{type: "text"},
+    item_number: %{type: "integer"},
+    inserted_at: %{type: "date"},
+    updated_at: %{type: "date"}
+  }
+}
+
 # add some search params according to Elastic JSON API
 search_payload = %{}
 
 # which document types should be included in the search?
 search_in = [doc_type]
 
+Elastix.Mapping.put(elastic_url, index_name, doc_type, mapping)
 Elastix.Document.index(elastic_url, index_name, doc_type, product.id, index_data)
 Elastix.Search.search(elastic_url, index_name, search_in, search_payload)
 Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
