@@ -1,9 +1,9 @@
 sudo: false
 language: elixir
 elixir:
-  - 1.3.3
+  - 1.4
 services:
   - elasticsearch
 script: "mix test"
 notifications:
-  email: werbitzky@gmail.com
+  email: henon.fabien@softcreations.fr
