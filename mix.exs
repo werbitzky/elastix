@@ -35,7 +35,7 @@ defmodule Elastix.Mixfile do
     [{:earmark, "~> 0.1", only: :dev},
      {:ex_doc, "~> 0.7", only: :dev},
      {:credo, "~> 0.6", only: [:dev, :test]},
-     {:mix_test_watch, "~> 0.2", only: [:test, :dev]},
+     {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
      {:poison, "~> 1.5 or ~> 2.0"},
      {:httpoison, "~> 0.10"}]
   end
