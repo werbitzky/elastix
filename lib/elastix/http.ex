@@ -39,6 +39,7 @@ defmodule Elastix.HTTP do
 
 
   @doc false
+  def process_response_body(""), do: ""
   def process_response_body(body) do
     case body |> to_string |> Poison.decode(poison_options()) do
       {:error, _} -> body
