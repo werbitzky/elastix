@@ -18,6 +18,7 @@ Elastix has *3 main modules* and one *utility module*, that can be used, if the 
 * [Elastix.Index](lib/elastix/index.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
 * [Elastix.Document](lib/elastix/document.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
 * [Elastix.Search](lib/elastix/search.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
+* [Elastix.Mapping](lib/elastix/mapping.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
 * and [Elastix.HTTP](lib/elastix/http.ex) – a thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper
 
 I will try and provide documentation and examples for all of them with time, for now just consult the source code.
