@@ -9,7 +9,7 @@ defmodule Elastix.Mixfile do
      elixir: "~> 1.0",
      description: "A simple Elasticsearch REST client written in Elixir.",
      package: package(),
-     docs: [source_ref: "v#{@version}", main: "overview"],
+     #docs: [source_ref: "v#{@version}", main: "overview"],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
