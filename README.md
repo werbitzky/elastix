@@ -13,11 +13,12 @@ When needed, the payload can be provided as an Elixir Map, which is internally c
 
 ## Overview
 
-Elastix has *3 main modules* and one *utility module*, that can be used, if the call/feature you want is not implemented (yet). However – please open issues or provide pull requests so I can improve the software for everybody. The modules are:
+Elastix has *5 main modules* and one *utility module*, that can be used, if the call/feature you want is not implemented (yet). However – please open issues or provide pull requests so I can improve the software for everybody. The modules are:
 
 * [Elastix.Index](lib/elastix/index.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
 * [Elastix.Document](lib/elastix/document.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
 * [Elastix.Search](lib/elastix/search.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
+* [Elastix.Bulk](lib/elastix/bulk.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
 * [Elastix.Mapping](lib/elastix/mapping.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
 * and [Elastix.HTTP](lib/elastix/http.ex) – a thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper
 
@@ -80,6 +81,46 @@ Elastix.Document.index(elastic_url, index_name, doc_type, product.id, index_data
 Elastix.Search.search(elastic_url, index_name, search_in, search_payload)
 Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
 
+```
+
+### Bulk request
+
+It is possible to execute `bulk` requests with *elastix*.
+
+Bulk requests take as parameters the list of lines to send to *Elasticsearch*. You can also optionally give them options. Available options are:
+
+* `index` the index of the request
+* `type` the document type of the request. *(you can't specify `type` without specifying `index`)*
+
+**Examples**
+
+```elixir
+lines = [
+  %{index: %{_id: "1"}},
+  %{field: "value1"},
+  %{index: %{_id: "2"}},
+  %{field: "value2"}
+]
+
+# Send bulk data
+Elastix.Bulk.post elastic_url, lines, index: "my_index", type: "my_type"
+# Send your lines by transforming them to iolist
+Elastix.Bulk.post_to_iolist elastic_url, lines, index: "my_index", type: "my_type"
+
+# Send raw data directly to the API
+data = Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end)
+
+Elastix.Bulk.post_raw elastic_url, data, index: "my_index", type: "my_type"
+
+# Finally, you can specify the index or the type directly in you lines
+lines = [
+  %{index: %{_id: "1", _index: "my_index", _type: "my_type"}},
+  %{field: "value1"},
+  %{index: %{_id: "2", _index: "my_other_index", _type: "my_other_type"}},
+  %{field: "value2"}
+]
+
+Elastix.Bulk.post elastic_url, lines
 ```
 
 ## Configuration
