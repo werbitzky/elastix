@@ -1,14 +1,9 @@
-## 0.4.0
-
-### Improvements:
-
-  - add support for bulk requests
-
 ## 0.3.0
 
 ### Improvements:
 
   - add support for mappings
+  - add support for bulk requests
 
 ## 0.2.0
 
