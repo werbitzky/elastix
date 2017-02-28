@@ -19,6 +19,9 @@ defmodule Elastix.HTTP do
     url = process_url(to_string(url))
     body = process_request_body(body)
 
+    username = Elastix.config(:username)
+    password = Elastix.config(:password)
+
     headers = headers
     |> Keyword.put_new(:"Content-Type", "application/json; charset=UTF-8")
 
