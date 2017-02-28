@@ -144,11 +144,6 @@ The above for example will
   * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
   * use shield for authentication
 
-```elixir
-config :elastix,
-  custom_headers: []
-```
-
 ## License
 
 Copyright © 2015 El Werbitzky <werbitzky@gmail.com>
