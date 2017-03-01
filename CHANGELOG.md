@@ -1,11 +1,18 @@
+## 0.3.0
+
+### Improvements
+  - add support for mappings
+  - add support for bulk requests
+  - bump up library versions (credo, httpoison, mix_test_watch)
+
 ## 0.2.0
 
 ### Improvements:
 
-  - add support for index_new (@manukall)
-  - add support for poison options (@manukall)
-  - add support for index refresh (@manukall)
-  - add shield support (@vdaniuk)
+  - add support for index_new
+  - add support for poison options
+  - add support for index refresh
+  - add shield support
 
 ## 0.1.1
 

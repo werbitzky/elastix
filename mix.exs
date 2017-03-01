@@ -1,7 +1,7 @@
 defmodule Elastix.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.2"
 
   def project do
     [app: :elastix,
@@ -32,12 +32,11 @@ defmodule Elastix.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:earmark, "~> 0.1", only: :dev},
-     {:ex_doc, "~> 0.7", only: :dev},
-     {:credo, "~> 0.5", only: [:dev, :test]},
-     {:mix_test_watch, "~> 0.2", only: [:test, :dev]},
-     {:poison, "~> 1.5 or ~> 2.0"},
-     {:httpoison, "~> 0.10"}]
+    [{:ex_doc, "~> 0.14", only: :dev},
+     {:credo, "~> 0.6", only: [:dev, :test]},
+     {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
+     {:poison, "~> 3.1"},
+     {:httpoison, "~> 0.11"}]
   end
 
   defp package do

@@ -19,27 +19,36 @@ defmodule Elastix.HTTP do
     url = process_url(to_string(url))
     body = process_request_body(body)
 
+    username = Elastix.config(:username)
+    password = Elastix.config(:password)
+
     headers = headers
     |> Keyword.put_new(:"Content-Type", "application/json; charset=UTF-8")
 
-    # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
-    username = Elastix.config(:username)
-    password = Elastix.config(:password)
     headers = cond do
+      # https://www.elastic.co/guide/en/shield/current/_using_elasticsearch_http_rest_clients_with_shield.html
       Elastix.config(:shield) ->
         Keyword.put(headers, :"Authorization", "Basic " <> Base.encode64("#{username}:#{password}"))
-      Elastix.config(:custom_headers) ->
-        Elastix.config(:custom_headers).call(%{method: method, url: url,body: body, headers: headers, options: options})
       true ->
         headers
     end
 
     options = Keyword.merge(default_httpoison_options(), options)
-    HTTPoison.Base.request(__MODULE__, method, url, body, headers, options, &process_status_code/1, &process_headers/1, &process_response_body/1)
+    HTTPoison.Base.request(
+      __MODULE__,
+      method,
+      url,
+      body,
+      headers,
+      options,
+      &process_status_code/1,
+      &process_headers/1,
+      &process_response_body/1)
   end
 
 
   @doc false
+  def process_response_body(""), do: ""
   def process_response_body(body) do
     case body |> to_string |> Poison.decode(poison_options()) do
       {:error, _} -> body
