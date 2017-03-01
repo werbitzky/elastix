@@ -23,7 +23,7 @@ defmodule Elastix.DocumentTest do
   end
 
   test "index should create and index with data" do
-    response = Document.index @test_url, @test_index, "message", 1, @data
+    {:ok, response} = Document.index @test_url, @test_index, "message", 1, @data
 
     assert response.status_code == 201
     assert response.body["_id"] == "1"
@@ -33,7 +33,7 @@ defmodule Elastix.DocumentTest do
   end
 
   test "index_new should index data without an id" do
-    response = Document.index_new @test_url, @test_index, "message", @data
+    {:ok, response} = Document.index_new @test_url, @test_index, "message", @data
 
     assert response.status_code == 201
     assert response.body["_id"]
@@ -43,14 +43,14 @@ defmodule Elastix.DocumentTest do
   end
 
   test "get should return 404 if not index was created" do
-    response = Document.get @test_url, @test_index, "message", 1
+    {:ok, response} = Document.get @test_url, @test_index, "message", 1
 
     assert response.status_code == 404
   end
 
   test "get should return data with 200 after index" do
     Document.index @test_url, @test_index, "message", 1, @data
-    response = Document.get @test_url, @test_index, "message", 1
+    {:ok, response} = Document.get @test_url, @test_index, "message", 1
     body = response.body
 
     assert response.status_code == 200
@@ -62,13 +62,13 @@ defmodule Elastix.DocumentTest do
   test "delete should delete created index" do
     Document.index @test_url, @test_index, "message", 1, @data
 
-    response = Document.get @test_url, @test_index, "message", 1
+    {:ok, response} = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 200
 
-    response = Document.delete @test_url, @test_index, "message", 1
+    {:ok, response} = Document.delete @test_url, @test_index, "message", 1
     assert response.status_code == 200
 
-    response = Document.get @test_url, @test_index, "message", 1
+    {:ok, response} = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 404
   end
 end
