@@ -10,7 +10,7 @@ defmodule Elastix.Document do
 
   @doc false
   def index(elastic_url, index_name, type_name, id, data, query_params) do
-    elastic_url <> make_path(index_name, type_name, id, query_params)
+    elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.put(Poison.encode!(data))
     |> process_response
   end
@@ -34,36 +34,40 @@ defmodule Elastix.Document do
 
   @doc false
   def get(elastic_url, index_name, type_name, id, query_params) do
-    elastic_url <> make_path(index_name, type_name, id, query_params)
+    elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.get
     |> process_response
   end
 
   @doc false
   def delete(elastic_url, index_name, type_name, id) do
-    elastic_url <> make_path(index_name, type_name, id, [])
+    elastic_url <> make_path(index_name, type_name, [], id)
     |> HTTP.delete
     |> process_response
   end
 
   @doc false
   def delete(elastic_url, index_name, type_name, id, query_params) do
-    elastic_url <> make_path(index_name, type_name, id, query_params)
+    elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.delete
     |> process_response
   end
 
   @doc false
-  def make_path(index_name, type_name, id \\ nil, query_params) do
-    path = "/#{index_name}/#{type_name}/#{id}"
-
-    case query_params do
-      [] -> path
-      _ -> add_query_params(path, query_params)
-    end
+  def update(elastic_url, index_name, type_name, id, data, query_params \\ []) do
+    elastic_url <> make_path(index_name, type_name, query_params, id, "_update")
+    |> HTTP.post(Poison.encode!(data))
+    |> process_response
   end
 
   @doc false
+  def make_path(index_name, type_name, query_params, id \\ nil, suffix \\ nil) do
+    path = "/#{index_name}/#{type_name}/#{id}/#{suffix}"
+    add_query_params(path, query_params)
+  end
+
+  @doc false
+  defp add_query_params(path, []), do: path
   defp add_query_params(path, query_params) do
     query_string = Enum.map_join query_params, "&", fn(param) ->
       "#{elem(param, 0)}=#{elem(param, 1)}"
