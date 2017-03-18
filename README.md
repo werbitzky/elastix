@@ -144,6 +144,23 @@ The above for example will
   * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
   * use shield for authentication
 
+## Running tests
+
+You need elastic search running locally on port 9200. A quick way of running any version of elastic, is via docker:
+
+```
+$ docker run -p 9200:9200 -it --rm elasticsearch:5.1.2
+```
+
+Then clone the repo and fetch its dependencies:
+
+```
+$ git clone git@github.com:werbitzky/elastix.git
+$ cd elastix
+$ mix deps.get
+$ mix test
+```
+
 ## License
 
 Copyright © 2017 El Werbitzky <werbitzky@gmail.com>
