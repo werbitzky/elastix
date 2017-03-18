@@ -18,8 +18,8 @@ defmodule Elastix.DocumentTest do
     :ok
   end
 
-  test "make_path should make url from index name, type, url and query params" do
-    assert Document.make_path(@test_index, "tweet", 2, version: 34, ttl: "1d") == "/#{@test_index}/tweet/2?version=34&ttl=1d"
+  test "make_path should make url from index name, type, query params, id, and suffix" do
+    assert Document.make_path(@test_index, "tweet", [version: 34, ttl: "1d"], 2, "_update") == "/#{@test_index}/tweet/2/_update?version=34&ttl=1d"
   end
 
   test "index should create and index with data" do
@@ -70,5 +70,22 @@ defmodule Elastix.DocumentTest do
 
     response = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 404
+  end
+
+  test "update can partially update document" do
+    Document.index @test_url, @test_index, "message", 1, @data
+
+    new_post_date = "2017-03-17T14:12:12"
+    patch = %{ doc: %{ post_date: new_post_date } }
+
+    response = Document.update @test_url, @test_index, "message", 1, patch
+    assert response.status_code == 200
+
+    %{body: body, status_code: status_code} = Document.get @test_url, @test_index, "message", 1
+
+    assert status_code == 200
+    assert body["_source"]["user"] == "örelbörel"
+    assert body["_source"]["post_date"] == new_post_date
+    assert body["_source"]["message"] == "trying out Elasticsearch"
   end
 end
