@@ -17,6 +17,7 @@ defmodule Elastix.Mapping do
   def put(elastic_url, index_names, type_name, data, query_params) when is_list(index_names) do
     elastic_url <> make_path(index_names, [type_name], query_params)
     |> HTTP.put(Poison.encode!(data))
+    |> process_response
   end
 
   @doc false
@@ -48,6 +49,7 @@ defmodule Elastix.Mapping do
   def get(elastic_url, index_names, type_names, query_params) when is_list(type_names) and is_list(index_names) do
     elastic_url <> make_path(index_names, type_names, query_params)
     |> HTTP.get
+    |> process_response
   end
 
   @doc false
@@ -74,6 +76,7 @@ defmodule Elastix.Mapping do
   def get_all(elastic_url, query_params) do
     elastic_url <> make_all_path(query_params)
     |> HTTP.get
+    |> process_response
   end
 
   @doc false
@@ -90,6 +93,7 @@ defmodule Elastix.Mapping do
   def get_all_with_type(elastic_url, type_names, query_params) when is_list(type_names) do
     elastic_url <> make_all_path(type_names, query_params)
     |> HTTP.get
+    |> process_response
   end
 
   @doc false
@@ -140,4 +144,7 @@ defmodule Elastix.Mapping do
 
     "#{path}?#{query_string}"
   end
+
+  @doc false
+  defp process_response({_, response}), do: response
 end

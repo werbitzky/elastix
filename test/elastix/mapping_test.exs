@@ -45,28 +45,28 @@ defmodule Elastix.MappingTest do
   end
 
   test "put mapping with no index should error" do
-    {:ok, response} = Mapping.put @test_url, @test_index, "message", @mapping
+    response = Mapping.put @test_url, @test_index, "message", @mapping
 
     assert response.status_code == 404
   end
 
   test "put should put mapping" do
     Index.create @test_url, @test_index, %{}
-    {:ok, response} = Mapping.put @test_url, @test_index, "message", @mapping
+    response = Mapping.put @test_url, @test_index, "message", @mapping
 
     assert response.status_code == 200
     assert response.body["acknowledged"] == true
   end
 
   test "get with non existing index should return error" do
-    {:ok, response} = Mapping.get @test_url, @test_index, "message"
+    response = Mapping.get @test_url, @test_index, "message"
 
     assert response.status_code == 404
   end
 
   test "get with non existing mapping should return nothing" do
     Index.create @test_url, @test_index, %{}
-    {:ok, response} = Mapping.get @test_url, @test_index, "message"
+    response = Mapping.get @test_url, @test_index, "message"
 
     assert response.status_code == 200
     assert response.body == %{}
@@ -75,7 +75,7 @@ defmodule Elastix.MappingTest do
   test "get mapping should return mapping" do
     Index.create @test_url, @test_index, %{}
     Mapping.put @test_url, @test_index, "message", @mapping
-    {:ok, response} = Mapping.get @test_url, @test_index, "message"
+    response = Mapping.get @test_url, @test_index, "message"
 
     assert response.status_code == 200
     assert response.body[@test_index]["mappings"]["message"] == @target_mapping
@@ -85,7 +85,7 @@ defmodule Elastix.MappingTest do
     Index.create @test_url, @test_index, %{}
     Mapping.put @test_url, @test_index, "message", @mapping
     Mapping.put @test_url, @test_index, "comment", @mapping
-    {:ok, response} = Mapping.get @test_url, @test_index, ["message", "comment"]
+    response = Mapping.get @test_url, @test_index, ["message", "comment"]
 
     assert response.status_code == 200
     assert response.body[@test_index]["mappings"]["message"] == @target_mapping
@@ -97,7 +97,7 @@ defmodule Elastix.MappingTest do
     Index.create @test_url, @test_index2, %{}
     Mapping.put @test_url, @test_index, "message", @mapping
     Mapping.put @test_url, @test_index2, "comment", @mapping
-    {:ok, response} = Mapping.get_all @test_url
+    response = Mapping.get_all @test_url
 
     assert response.status_code == 200
     assert response.body[@test_index]["mappings"]["message"] == @target_mapping
@@ -109,7 +109,7 @@ defmodule Elastix.MappingTest do
     Index.create @test_url, @test_index2, %{}
     Mapping.put @test_url, @test_index, "message", @mapping
     Mapping.put @test_url, @test_index2, "comment", @mapping
-    {:ok, response} = Mapping.get_all_with_type @test_url, ["message", "comment"]
+    response = Mapping.get_all_with_type @test_url, ["message", "comment"]
 
     assert response.status_code == 200
     assert response.body[@test_index]["mappings"]["message"] == @target_mapping
@@ -120,7 +120,7 @@ defmodule Elastix.MappingTest do
     Index.create @test_url, @test_index, %{}
     Mapping.put @test_url, @test_index, "message", @mapping
 
-    {:ok, response} = Document.index @test_url, @test_index, "message", 1, @data
+    response = Document.index @test_url, @test_index, "message", 1, @data
 
     assert response.status_code == 201
     assert response.body["_id"] == "1"

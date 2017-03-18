@@ -12,6 +12,7 @@ defmodule Elastix.Document do
   def index(elastic_url, index_name, type_name, id, data, query_params) do
     elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.put(Poison.encode!(data))
+    |> process_response
   end
 
   @doc false
@@ -23,6 +24,7 @@ defmodule Elastix.Document do
   def index_new(elastic_url, index_name, type_name, data, query_params) do
     elastic_url <> make_path(index_name, type_name, query_params)
     |> HTTP.post(Poison.encode!(data))
+    |> process_response
   end
 
   @doc false
@@ -34,18 +36,21 @@ defmodule Elastix.Document do
   def get(elastic_url, index_name, type_name, id, query_params) do
     elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.get
+    |> process_response
   end
 
   @doc false
   def delete(elastic_url, index_name, type_name, id) do
     elastic_url <> make_path(index_name, type_name, [], id)
     |> HTTP.delete
+    |> process_response
   end
 
   @doc false
   def delete(elastic_url, index_name, type_name, id, query_params) do
     elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.delete
+    |> process_response
   end
 
   @doc false
@@ -70,4 +75,7 @@ defmodule Elastix.Document do
 
     "#{path}?#{query_string}"
   end
+
+  @doc false
+  defp process_response({_, response}), do: response
 end
