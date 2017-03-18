@@ -12,12 +12,12 @@ defmodule Elastix.IndexTest do
   end
 
   test "exists? should return false if index is not created" do
-    assert Index.exists?(@test_url, @test_index) == false
+    assert {:ok, false} == Index.exists?(@test_url, @test_index)
   end
 
   test "exists? should return true if index is created" do
-    assert Index.create(@test_url, @test_index, %{}).status_code == 200
-    assert Index.exists?(@test_url, @test_index) == true
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
+    assert {:ok, true} == Index.exists?(@test_url, @test_index)
   end
 
   test "make_path should make path from id and url" do
@@ -25,35 +25,35 @@ defmodule Elastix.IndexTest do
   end
 
   test "create then delete should respond with 200" do
-    assert Index.create(@test_url, @test_index, %{}).status_code == 200
-    assert Index.delete(@test_url, @test_index).status_code == 200
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 200}} = Index.delete(@test_url, @test_index)
   end
 
   test "double create should respond with 400" do
-    assert Index.create(@test_url, @test_index, %{}).status_code == 200
-    assert Index.create(@test_url, @test_index, %{}).status_code == 400
-    assert Index.delete(@test_url, @test_index).status_code == 200
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 400}} = Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 200}} = Index.delete(@test_url, @test_index)
   end
 
   test "get of uncreated index should respond with 404" do
-    assert Index.get(@test_url, @test_index).status_code == 404
+    assert {:ok, %{status_code: 404}} = Index.get(@test_url, @test_index)
   end
 
   test "get of created index should respond with 200 and index data" do
-    assert Index.create(@test_url, @test_index, %{}).status_code == 200
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
 
-    index = Index.get(@test_url, @test_index)
+    {:ok, index} = Index.get(@test_url, @test_index)
     assert index.status_code == 200
 
     assert index.body[@test_index]
   end
 
   test "refresh of uncreated index should respond with 404" do
-    assert Index.refresh(@test_url, @test_index).status_code == 404
+    assert {:ok, %{status_code: 404}} = Index.refresh(@test_url, @test_index)
   end
 
   test "refresh of existing index should respond with 200" do
-    Index.create(@test_url, @test_index, %{}).status_code
-    assert Index.refresh(@test_url, @test_index).status_code == 200
+    Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 200}} = Index.refresh(@test_url, @test_index)
   end
 end
