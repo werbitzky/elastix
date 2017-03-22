@@ -36,7 +36,8 @@ defmodule Elastix.Mixfile do
      {:credo, "~> 0.6", only: [:dev, :test]},
      {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
      {:poison, "~> 3.1"},
-     {:httpoison, "~> 0.11"}]
+     {:httpoison, "~> 0.11"},
+     {:aws_auth, "~> 0.6.1"}]
   end
 
   defp package do
