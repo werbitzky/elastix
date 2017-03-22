@@ -52,7 +52,6 @@ defmodule Elastix.Document do
   def update(elastic_url, index_name, type_name, id, data, query_params \\ []) do
     elastic_url <> make_path(index_name, type_name, query_params, id, "_update")
     |> HTTP.post(Poison.encode!(data))
-    |> process_response
   end
 
   @doc false

@@ -78,10 +78,10 @@ defmodule Elastix.DocumentTest do
     new_post_date = "2017-03-17T14:12:12"
     patch = %{ doc: %{ post_date: new_post_date } }
 
-    response = Document.update @test_url, @test_index, "message", 1, patch
+    {:ok, response} = Document.update @test_url, @test_index, "message", 1, patch
     assert response.status_code == 200
 
-    %{body: body, status_code: status_code} = Document.get @test_url, @test_index, "message", 1
+    {:ok, %{body: body, status_code: status_code}} = Document.get @test_url, @test_index, "message", 1
 
     assert status_code == 200
     assert body["_source"]["user"] == "örelbörel"
