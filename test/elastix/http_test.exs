@@ -4,6 +4,14 @@ defmodule Elastix.HTTPTest do
 
   @test_url Elastix.config(:test_url)
 
+  setup do
+    # reset application configs
+    Application.put_env(:elastix, :shield, false)
+    Application.put_env(:elastix, :aws_es, nil)
+
+    :ok
+  end
+
   test "process_url should concat with path" do
     assert HTTP.process_url("http://127.0.0.1:9200/some_path") == "http://127.0.0.1:9200/some_path"
   end
@@ -48,7 +56,7 @@ defmodule Elastix.HTTPTest do
   describe "process_request_headers" do
     test "without authorization header" do
       headers = [{:"Content-Type", "application/json; charset=UTF-8"}]
-      assert HTTP.process_request_headers([], nil, nil) == headers
+      assert HTTP.process_request_headers([]) == headers
     end
 
     test "shield authorization header" do
@@ -65,7 +73,7 @@ defmodule Elastix.HTTPTest do
         {:"Authorization", "Basic " <> auth_token}
       ]
 
-      assert HTTP.process_request_headers([], :shield, nil) == headers
+      assert HTTP.process_request_headers([]) == headers
     end
 
     test "aws_es signed authorization header" do
@@ -83,7 +91,7 @@ defmodule Elastix.HTTPTest do
 
       request_data = {:get, "https://es.amazonaws.com/", "body"}
 
-      assert HTTP.process_request_headers([], :aws_es, request_data) == headers
+      assert HTTP.process_request_headers([], request_data) == headers
     end
   end
 end
