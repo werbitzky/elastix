@@ -128,6 +128,7 @@ Elastix.Bulk.post elastic_url, lines
 Currently we can
   * pass options to the JSON decoder used by Elastix ([poison](https://github.com/devinus/poison))
   * optionally use shield for authentication ([shield](https://www.elastic.co/products/shield))
+  * optionally pass authentication headers for use with Amazon AWS ElasticSearch (aws_es)
   * optionally pass along custom headers for every request made to the elasticsearch server(s)s
 
 by setting the respective keys in your `config/config.exs`
@@ -143,6 +144,17 @@ config :elastix,
 The above for example will
   * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
   * use shield for authentication
+
+```elixir
+config :elastix, aws_es: [
+    region: "us-west-2", 
+    access_key: "", 
+    secret_key: ""
+  ]
+```
+
+The above for example will
+  * generate and inject a signed request header for authentication with AWS ES
 
 ## Running tests
 
