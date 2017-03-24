@@ -54,8 +54,8 @@ defmodule Elastix.HTTP do
     end
 
     headers
-    |> adapter.process_headers(request_data)
     |> Keyword.put_new(:"Content-Type", "application/json; charset=UTF-8")
+    |> adapter.process_headers(request_data)
   end
 
   defp poison_options do

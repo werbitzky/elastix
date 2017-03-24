@@ -69,29 +69,32 @@ defmodule Elastix.HTTPTest do
 
       # generate the auth headers to test against
       headers = [
-        {:"Content-Type", "application/json; charset=UTF-8"},
-        {:"Authorization", "Basic " <> auth_token}
+        {:"Authorization", "Basic " <> auth_token},
+        {:"Content-Type", "application/json; charset=UTF-8"}
       ]
 
       assert HTTP.process_request_headers([]) == headers
     end
 
     test "aws_es signed authorization header" do
+      url  = "https://es.amazonaws.com/"
+      time = DateTime.utc_now() |> DateTime.to_naive()
+
       # update the elastix configs to use aws_es
       Application.put_env(:elastix, :aws_es, [region: "us-west-2", access_key: "key", secret_key: "secret"])
 
       # https://github.com/bryanjos/aws_auth
-      signed_request = AWSAuth.sign_authorization_header("key", "secret", "GET", "https://es.amazonaws.com/", "us-west-2", "es", Map.new, "body")
+      signed_request = AWSAuth.sign_authorization_header("key", "secret", "GET", url, "us-west-2", "es", %{"Content-Type" => "application/json; charset=UTF-8","x-amz-date" => AWSAuth.Utils.format_time(time)}, "body", time)
 
       # generate the signed auth headers to test against
       headers = [
-        {:"Content-Type", "application/json; charset=UTF-8"},
-        {:"Authorization", signed_request}
+        {:"x-amz-date", AWSAuth.Utils.format_time(time)},
+        {:"Content-Type", "application/json; charset=UTF-8"}
       ]
 
-      request_data = {:get, "https://es.amazonaws.com/", "body"}
+      headers_with_auth = [{:"Authorization", signed_request}] ++ headers
 
-      assert HTTP.process_request_headers([], request_data) == headers
+      assert HTTP.process_request_headers(headers, {:get, url, "body"}) == headers_with_auth
     end
   end
 end
