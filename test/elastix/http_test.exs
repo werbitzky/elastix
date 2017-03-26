@@ -88,7 +88,9 @@ defmodule Elastix.HTTPTest do
 
       # generate the signed auth headers to test against
       headers = [
+        {:"x-amz-content-sha256", AWSAuth.Utils.hash_sha256("body")},
         {:"x-amz-date", AWSAuth.Utils.format_time(time)},
+        {:"host", "es.amazonaws.com"},
         {:"Content-Type", "application/json; charset=UTF-8"}
       ]
 
