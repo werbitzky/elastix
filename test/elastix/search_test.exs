@@ -32,7 +32,7 @@ defmodule Elastix.SearchTest do
         term: %{ user: "werbitzky" }
       }
     }
-    response = Search.search @test_url, @test_index, [], data
+    {:ok, response} = Search.search @test_url, @test_index, [], data
 
     assert response.status_code == 200
   end

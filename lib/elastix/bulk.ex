@@ -6,20 +6,17 @@ defmodule Elastix.Bulk do
   def post(elastic_url, lines, options \\ [], query_params \\ []) do
     elastic_url <> make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params)
     |> HTTP.put(Enum.reduce(lines, "", fn (line, payload) -> payload <> Poison.encode!(line) <> "\n" end))
-    |> process_response
   end
 
   def post_to_iolist(elastic_url, lines, options \\ [], query_params \\ []) do
     elastic_url <> make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params)
     |> HTTP.put(Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end))
-    |> process_response
   end
 
   @doc false
   def post_raw(elastic_url, raw_data, options \\ [], query_params \\ []) do
     elastic_url <> make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params)
     |> HTTP.put(raw_data)
-    |> process_response
   end
 
   @doc false
@@ -44,7 +41,4 @@ defmodule Elastix.Bulk do
 
     "#{path}?#{query_string}"
   end
-
-  @doc false
-  defp process_response({_, response}), do: response
 end
