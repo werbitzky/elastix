@@ -1,7 +1,7 @@
 defmodule Elastix.Mixfile do
   use Mix.Project
 
-  @version "0.3.2"
+  @version "0.4.0"
 
   def project do
     [app: :elastix,
@@ -36,7 +36,7 @@ defmodule Elastix.Mixfile do
      {:credo, "~> 0.6", only: [:dev, :test]},
      {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
      {:poison, "~> 3.1"},
-     {:httpoison, "~> 0.11"}]
+     {:httpoison, ">= 0.7.0"}]
   end
 
   defp package do

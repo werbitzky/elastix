@@ -1,3 +1,15 @@
+## 0.4.0
+
+### Improvements
+
+  - Allow options in Search API calls
+  - don't strip return atoms
+  - add update api support
+
+### Breaking Changes
+
+  - don't strip return atoms
+
 ## 0.3.0
 
 ### Improvements
