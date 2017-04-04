@@ -23,11 +23,11 @@ defmodule Elastix.Search do
       _ -> path_root <> "/" <> Enum.join types, ","
     end
 
-    path = "#{path}/_search"
+    full_path = "#{path}/_search"
 
     case query_params do
-      [] -> path
-      _ -> add_query_params(path, query_params)
+      [] -> full_path
+      _ -> add_query_params(full_path, query_params)
     end
   end
 

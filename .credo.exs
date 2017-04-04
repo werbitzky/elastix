@@ -85,6 +85,8 @@
         {Credo.Check.Warning.UnusedStringOperation},
         {Credo.Check.Warning.UnusedTupleOperation},
         {Credo.Check.Warning.OperationWithConstantResult},
+
+        {Credo.Check.Readability.Specs, false}
       ]
     }
   ]
