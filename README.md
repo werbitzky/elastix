@@ -129,6 +129,7 @@ Currently we can
   * pass options to the JSON decoder used by Elastix ([poison](https://github.com/devinus/poison))
   * optionally use shield for authentication ([shield](https://www.elastic.co/products/shield))
   * optionally pass along custom headers for every request made to the elasticsearch server(s)s
+  * optionally pass along options to [HTTPoison](https://github.com/edgurgel/httpoison)
 
 by setting the respective keys in your `config/config.exs`
 
@@ -137,7 +138,8 @@ config :elastix,
   poison_options: [keys: :atoms],
   shield: true,
   username: "username",
-  password: "password"
+  password: "password",
+  httpoison_options: [hackney: [pool: :elastix_pool]]
 ```
 
 The above for example will
