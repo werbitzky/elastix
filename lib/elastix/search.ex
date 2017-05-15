@@ -11,7 +11,7 @@ defmodule Elastix.Search do
   @doc false
   def search(elastic_url, index, types, data, query_params, options \\ []) do
     elastic_url <> make_path(index, types, query_params)
-    |> HTTP.post(Poison.encode!(data), options)
+    |> HTTP.post(Poison.encode!(data), [], options)
   end
 
   @doc false

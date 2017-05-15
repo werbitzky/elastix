@@ -6,6 +6,19 @@ defmodule Elastix.SearchTest do
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
+  @document_data %{
+    user: "werbitzky",
+    post_date: "2009-11-15T14:12:12",
+    message: "trying out Elasticsearch"
+  }
+  @query_data %{
+    query: %{
+      term: %{ user: "werbitzky" }
+    }
+  }
+
+
+
 
   setup do
     Index.delete(@test_url, @test_index)
@@ -19,21 +32,17 @@ defmodule Elastix.SearchTest do
   end
 
   test "search should return with status 200" do
-    data = %{
-      user: "werbitzky",
-      post_date: "2009-11-15T14:12:12",
-      message: "trying out Elasticsearch"
-    }
+    Document.index @test_url, @test_index, "message", 1, @document_data, [refresh: true]
 
-    Document.index @test_url, @test_index, "message", 1, data, [refresh: true]
-
-    data = %{
-      query: %{
-        term: %{ user: "werbitzky" }
-      }
-    }
-    {:ok, response} = Search.search @test_url, @test_index, [], data
+    {:ok, response} = Search.search @test_url, @test_index, [], @query_data
 
     assert response.status_code == 200
+  end
+
+  test "search accepts httpoison options" do
+    Document.index @test_url, @test_index, "message", 1, @document_data, [refresh: true]
+
+    {:error, %HTTPoison.Error{reason: :timeout}} =
+      Search.search @test_url, @test_index, [], @query_data, [], recv_timeout: 0
   end
 end
