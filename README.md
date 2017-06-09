@@ -142,6 +142,36 @@ config :elastix,
   httpoison_options: [hackney: [pool: :elastix_pool]]
 ```
 
+### Custom headers
+
+To add custom headers to a request you must pass in the custom_headers option.
+
+For example:
+
+```elixir
+config :elastix,
+  custom_headers: {MyModule, :add_aws_signature, ["us-east"]}
+```
+
+This must be a `{Module, :function, [args]}` tuple. The request will be added
+to the head of the args list. The args list may be empty. The request is a map
+with the `method`, `headers`, `url`, and `body` keys.
+
+The function you define should return the full set of headers you want to send,
+including any headers passed in. For example:
+
+```elixir
+defmodule MyModule do
+  def add_aws_signature(request, region) do
+    [{"Authorization", generate_aws_signature(request, region)} | request.headers]
+  end
+
+  defp generate_aws_signature(request, region) do
+    # See: https://github.com/bryanjos/aws_auth or similar
+  end
+end
+```
+
 The above for example will
   * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
   * use shield for authentication
