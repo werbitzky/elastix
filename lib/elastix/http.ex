@@ -56,7 +56,7 @@ defmodule Elastix.HTTP do
   end
 
   defp add_content_type_header(headers) do
-    Keyword.put_new(headers, :"Content-Type", "application/json; charset=UTF-8")
+    [{"Content-Type", "application/json; charset=UTF-8"} | headers]
   end
 
   defp add_shield_header(headers) do

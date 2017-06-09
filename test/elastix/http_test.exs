@@ -53,7 +53,7 @@ defmodule Elastix.HTTPTest do
     Application.delete_env(:elastix, :custom_headers)
     assert {"yolo", "true"} in fake_resp
     assert {"test", "pass"} in fake_resp
-    assert {:"Content-Type", "application/json; charset=UTF-8"} in fake_resp
+    assert {"Content-Type", "application/json; charset=UTF-8"} in fake_resp
   end
 
   # Test implementation of custom headers
