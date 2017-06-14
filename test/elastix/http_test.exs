@@ -44,4 +44,25 @@ defmodule Elastix.HTTPTest do
     assert HTTP.process_response_body(body) == %{some: "json"}
     Application.delete_env(:elastix, :poison_options)
   end
+
+  test "adding custom headers" do
+    Application.put_env(:elastix, :custom_headers, {__MODULE__, :add_custom_headers, [:foo]})
+    Application.put_env(:elastix, :test_request_mfa, {__MODULE__, :return_headers, []})
+    fake_resp = HTTP.request("GET", "#{@test_url}/_cluster/health", "", [{"yolo", "true"}])
+    Application.delete_env(:elastix, :test_request_mfa)
+    Application.delete_env(:elastix, :custom_headers)
+    assert {"yolo", "true"} in fake_resp
+    assert {"test", "pass"} in fake_resp
+    assert {"Content-Type", "application/json; charset=UTF-8"} in fake_resp
+  end
+
+  # Test implementation of custom headers
+  def add_custom_headers(request, :foo) do
+    [{"test", "pass"} | request.headers]
+  end
+
+  # Skip actual http request so we can test what we sent to poison.
+  def return_headers(_,_,_,_,headers,_,_,_,_) do
+    headers
+  end
 end
