@@ -32,7 +32,6 @@ defmodule Elastix.HTTP do
       &process_response_body/1)
   end
 
-
   @doc false
   def process_response_body(""), do: ""
   def process_response_body(body) do
@@ -43,10 +42,10 @@ defmodule Elastix.HTTP do
   end
 
   @doc """
-  Inject additional headers into request. 
+  Inject additional headers into request.
   Authorization headers are delegated to an auth "adapter" module: Elastix.Auth.{Shield, AWSES, None}
   """
-  def process_request_headers(headers, request_data \\ nil) do 
+  def process_request_headers(headers, request_data \\ nil) do
     adapter = cond do
       Elastix.config(:shield) -> Elastix.Auth.Shield
       Elastix.config(:aws_es) -> Elastix.Auth.AWSES
