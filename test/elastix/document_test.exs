@@ -1,7 +1,7 @@
 defmodule Elastix.DocumentTest do
+  require Logger
   use ExUnit.Case
-  alias Elastix.Index
-  alias Elastix.Document
+  alias Elastix.{Document,Index,Search}
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
@@ -70,6 +70,28 @@ defmodule Elastix.DocumentTest do
 
     {:ok, response} = Document.get @test_url, @test_index, "message", 1
     assert response.status_code == 404
+  end
+
+  test "delete by query should remove all docs that match" do
+    Document.index @test_url, @test_index, "message", 1, @data, [refresh: true]
+    Document.index @test_url, @test_index, "message", 2, @data, [refresh: true]
+
+    no_match = Map.put(@data, :user, "no match")
+    Document.index @test_url, @test_index, "message", 3, no_match, [refresh: true]
+
+    match_all_query = %{"query" => %{"match_all" => %{}}}
+
+    {:ok, response} = Search.search @test_url, @test_index, ["message"], match_all_query
+    assert response.status_code == 200
+    assert response.body["hits"]["total"] == 3
+
+    query = %{"query" => %{"match" => %{"user" => "örelbörel"}}}
+    {:ok, response} = Document.delete_matching @test_url, @test_index, query, [refresh: true]
+    assert response.status_code == 200
+
+    {:ok, response} = Search.search @test_url, @test_index, ["message"], match_all_query
+    assert response.status_code == 200
+    assert response.body["hits"]["total"] == 1
   end
 
   test "update can partially update document" do

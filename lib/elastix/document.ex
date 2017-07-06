@@ -37,15 +37,18 @@ defmodule Elastix.Document do
   end
 
   @doc false
-  def delete(elastic_url, index_name, type_name, id) do
-    elastic_url <> make_path(index_name, type_name, [], id)
+  def delete(elastic_url, index_name, type_name, id, query_params \\ []) do
+    elastic_url <> make_path(index_name, type_name, query_params, id)
     |> HTTP.delete
   end
 
-  @doc false
-  def delete(elastic_url, index_name, type_name, id, query_params) do
-    elastic_url <> make_path(index_name, type_name, query_params, id)
-    |> HTTP.delete
+  @doc """
+  Uses the Delete By Query API.
+  """
+  def delete_matching(elastic_url, index_name, %{}=query, query_params \\ []) do
+    elastic_url <> "/#{index_name}/_delete_by_query"
+    |> add_query_params(query_params)
+    |> HTTP.post(Poison.encode!(query))
   end
 
   @doc false
