@@ -1,4 +1,5 @@
 sudo: false
+dist: trusty
 language: elixir
 elixir:
   - 1.3.3
