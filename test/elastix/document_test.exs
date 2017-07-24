@@ -110,4 +110,70 @@ defmodule Elastix.DocumentTest do
     assert body["_source"]["post_date"] == new_post_date
     assert body["_source"]["message"] == "trying out Elasticsearch"
   end
+
+  test "can get multiple documents (multi get)" do
+    Document.index @test_url, @test_index, "message", 1, @data
+    Document.index @test_url, @test_index, "message", 2, @data
+
+    query = %{"docs" =>
+      [
+        %{
+          "_index" => @test_index,
+          "_type" => "message",
+          "_id" => "1"
+        },
+        %{
+          "_index" => @test_index,
+          "_type" => "message",
+          "_id" => "2"
+        }
+      ]
+    }
+    {:ok, %{body: body, status_code: status_code}} = Document.mget @test_url, query
+
+    assert status_code === 200
+    assert length(body["docs"]) == 2
+  end
+
+  test "can get multiple documents (multi get with index)" do
+    Document.index @test_url, @test_index, "message", 1, @data
+    Document.index @test_url, @test_index, "message", 2, @data
+
+    query = %{"docs" =>
+      [
+        %{
+          "_type" => "message",
+          "_id" => "1"
+        },
+        %{
+          "_type" => "message",
+          "_id" => "2"
+        }
+      ]
+    }
+    {:ok, %{body: body, status_code: status_code}} = Document.mget @test_url, query, @test_index
+
+    assert status_code === 200
+    assert length(body["docs"]) == 2
+  end
+
+  test "can get multiple documents (multi get with index and type)" do
+    Document.index @test_url, @test_index, "message", 1, @data
+    Document.index @test_url, @test_index, "message", 2, @data
+
+    query = %{"docs" =>
+      [
+        %{
+          "_id" => "1"
+        },
+        %{
+          "_id" => "2"
+        }
+      ]
+    }
+    {:ok, %{body: body, status_code: status_code}} = Document.mget @test_url, query, @test_index, "message"
+
+    assert status_code === 200
+    assert length(body["docs"]) == 2
+  end
 end

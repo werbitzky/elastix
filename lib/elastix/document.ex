@@ -36,6 +36,20 @@ defmodule Elastix.Document do
     |> HTTP.get
   end
 
+  @doc """
+  Get multiple documents matching the query using the Multi Get API.
+  """
+  def mget(elastic_url, query, index_name \\ nil, type_name \\ nil, query_params \\ []) do
+    path = [index_name, type_name]
+      |> Enum.filter(fn v -> v end) # Filter out nils.
+      |> Enum.join("/")
+    url = elastic_url <> "/#{path}/_mget"
+      |> add_query_params(query_params)
+
+    # HTTPoison does not provide an API for a GET request with a body.
+    HTTP.request(:get, url, Poison.encode!(query))
+  end
+
   @doc false
   def delete(elastic_url, index_name, type_name, id, query_params \\ []) do
     elastic_url <> make_path(index_name, type_name, query_params, id)
