@@ -22,6 +22,10 @@ defmodule Elastix.DocumentTest do
     assert Document.make_path(@test_index, "tweet", [version: 34, ttl: "1d"], 2, "_update") == "/#{@test_index}/tweet/2/_update?version=34&ttl=1d"
   end
 
+  test "make_path without and id should make url from index name, type, and query params" do
+    assert Document.make_path(@test_index, "tweet", [version: 34, ttl: "1d"]) == "/#{@test_index}/tweet?version=34&ttl=1d"
+  end
+
   test "index should create and index with data" do
     {:ok, response} = Document.index @test_url, @test_index, "message", 1, @data
 
