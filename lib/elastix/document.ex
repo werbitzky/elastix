@@ -72,9 +72,13 @@ defmodule Elastix.Document do
   end
 
   @doc false
-  def make_path(index_name, type_name, query_params, id \\ nil, suffix \\ nil) do
-    path = "/#{index_name}/#{type_name}/#{id}/#{suffix}"
-    add_query_params(path, query_params)
+  def make_path(index_name, type_name, query_params) do
+    "/#{index_name}/#{type_name}"
+    |> add_query_params(query_params)
+  end
+  def make_path(index_name, type_name, query_params, id, suffix \\ nil) do
+    "/#{index_name}/#{type_name}/#{id}/#{suffix}"
+    |> add_query_params(query_params)
   end
 
   @doc false
