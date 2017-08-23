@@ -15,6 +15,12 @@ defmodule Elastix.Search do
   end
 
   @doc false
+  def scroll(elastic_url, data, options \\ []) do
+    elastic_url <> "/_search/scroll"
+    |> HTTP.post(Poison.encode!(data), [], options)
+  end
+
+  @doc false
   def make_path(index, types, query_params) do
     path_root = "/#{index}"
 
