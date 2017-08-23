@@ -3,6 +3,7 @@ defmodule Elastix.SearchTest do
   alias Elastix.Search
   alias Elastix.Index
   alias Elastix.Document
+  alias HTTPoison.Response
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
@@ -16,9 +17,11 @@ defmodule Elastix.SearchTest do
       term: %{ user: "werbitzky" }
     }
   }
-
-
-
+  @scroll_query %{
+    size: 5,
+    query: %{match_all: %{}},
+    sort: ["_doc"]
+  }
 
   setup do
     Index.delete(@test_url, @test_index)
@@ -44,5 +47,22 @@ defmodule Elastix.SearchTest do
 
     {:error, %HTTPoison.Error{reason: :timeout}} =
       Search.search @test_url, @test_index, [], @query_data, [], recv_timeout: 0
+  end
+
+  test "can scroll through all documents" do
+    for i <- 1..10,
+      do: Document.index @test_url, @test_index, "message", i, @document_data, [refresh: true]
+
+    {:ok, %Response{body: body}} = Search.search @test_url, @test_index, [], @scroll_query, [scroll: "1m"]
+
+    assert length(body["hits"]["hits"]) === 5
+
+    {:ok, %Response{body: body}} = Search.scroll @test_url, %{ scroll: "1m", scroll_id: body["_scroll_id"] }
+
+    assert length(body["hits"]["hits"]) === 5
+
+    {:ok, %Response{body: body}} = Search.scroll @test_url, %{ scroll: "1m", scroll_id: body["_scroll_id"] }
+
+    assert length(body["hits"]["hits"]) === 0
   end
 end
