@@ -68,7 +68,7 @@ defmodule Elastix.MappingTest do
     Index.create @test_url, @test_index, %{}
     {:ok, response} = Mapping.get @test_url, @test_index, "message"
 
-    assert response.status_code == 200
+    assert response.status_code == 404
     assert response.body == %{}
   end
 
