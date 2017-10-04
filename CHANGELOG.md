@@ -1,3 +1,15 @@
+## 0.5.0
+
+### Improvements
+
+  - fix Hackney options when searching
+  - add support for custom headers
+  - use regular strings for headers
+  - add delete by query functionality
+  - add multi-get functionality
+  - remove double backslash from Document.make_path
+  - add basic scrolling api
+
 ## 0.4.0
 
 ### Improvements
