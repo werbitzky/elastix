@@ -34,6 +34,11 @@ defmodule Elastix.SearchTest do
     assert path == "/#{@test_index}/tweet,product/_search?ttl=1d&timeout=123"
   end
 
+  test "make_path should make path that can interchange api type" do
+    path = Search.make_path(@test_index, ["tweet", "product"], [ttl: "1d", timeout: 123], "_count")
+    assert path == "/#{@test_index}/tweet,product/_count?ttl=1d&timeout=123"
+  end
+
   test "search should return with status 200" do
     Document.index @test_url, @test_index, "message", 1, @document_data, [refresh: true]
 
@@ -64,5 +69,14 @@ defmodule Elastix.SearchTest do
     {:ok, %Response{body: body}} = Search.scroll @test_url, %{ scroll: "1m", scroll_id: body["_scroll_id"] }
 
     assert length(body["hits"]["hits"]) === 0
+  end
+
+  test "count should return with status 200" do
+    Document.index @test_url, @test_index, "message", 1, @document_data, [refresh: true]
+
+    {:ok, response} = Search.count @test_url, @test_index, [], @query_data
+
+    assert response.status_code == 200
+    assert response.body["count"] == 1
   end
 end
