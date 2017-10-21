@@ -4,8 +4,12 @@ defmodule Elastix.HTTPTest do
 
   @test_url Elastix.config(:test_url)
 
-  test "process_url should concat with path" do
-    assert HTTP.process_url("http://127.0.0.1:9200/some_path") == "http://127.0.0.1:9200/some_path"
+  test "prepare_url/2 should concat url with path" do
+    assert HTTP.prepare_url("http://127.0.0.1:9200/", "/some_path") == "http://127.0.0.1:9200/some_path"
+  end
+
+  test "prepare_url/2 should concat url with a list of path parts" do
+    assert HTTP.prepare_url("http://127.0.0.1:9200/", ["/some/", "/path/"]) == "http://127.0.0.1:9200/some/path"
   end
 
   test "get should respond with 200" do

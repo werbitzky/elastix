@@ -4,9 +4,10 @@ defmodule Elastix.HTTP do
   use HTTPoison.Base
 
   @doc false
-  def process_url(url) do
-    url
-  end
+  def prepare_url(url, path) when is_binary(path),
+    do: URI.merge(url, path) |> to_string
+  def prepare_url(url, parts) when is_list(parts),
+    do: prepare_url(url, Path.join(parts))
 
   @doc false
   def request(method, url, body \\ "", headers \\ [], options \\ []) do
@@ -15,7 +16,7 @@ defmodule Elastix.HTTP do
     else
       url
     end
-    full_url = process_url(to_string(query_url))
+    full_url = to_string(query_url)
     body = process_request_body(body)
 
     full_headers = headers
@@ -74,7 +75,7 @@ defmodule Elastix.HTTP do
     case Elastix.config(:custom_headers) do
       nil -> headers
       {mod, fun, args} ->
-        request = %{method: method, headers: headers, url: url, body: body} 
+        request = %{method: method, headers: headers, url: url, body: body}
         case apply(mod, fun, [request | args]) do
           headers when is_list(headers) -> headers
           _ -> raise("custom headers must return a header list (keyword list)")

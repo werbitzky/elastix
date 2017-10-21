@@ -20,10 +20,6 @@ defmodule Elastix.IndexTest do
     assert {:ok, true} == Index.exists?(@test_url, @test_index)
   end
 
-  test "make_path should make path from id and url" do
-    assert Index.make_path(@test_index) == "/#{@test_index}"
-  end
-
   test "create then delete should respond with 200" do
     assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
     assert {:ok, %{status_code: 200}} = Index.delete(@test_url, @test_index)

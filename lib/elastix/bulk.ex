@@ -1,11 +1,13 @@
 defmodule Elastix.Bulk do
   @moduledoc """
   """
+  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.HTTP
 
   def post(elastic_url, lines, options \\ [], query_params \\ []) do
-    elastic_url <> make_path(
-      Keyword.get(options, :index), Keyword.get(options, :type), query_params)
+    elastic_url
+    |> prepare_url(make_path(
+      Keyword.get(options, :index), Keyword.get(options, :type), query_params))
     |> HTTP.put(
       Enum.reduce(
         lines, "",
