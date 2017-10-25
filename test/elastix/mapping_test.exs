@@ -32,6 +32,13 @@ defmodule Elastix.MappingTest do
     :ok
   end
 
+  defp elasticsearch_version do
+    %HTTPoison.Response{body: %{"version" => %{"number" => v}}, status_code: 200}
+      = Elastix.HTTP.get!(@test_url)
+
+    v |> String.split([".", "-"]) |> Enum.take(3) |> Enum.map(&String.to_integer/1) |> List.to_tuple
+  end
+
   test "make_path should make url from index names, types, and query params" do
     assert Mapping.make_path([@test_index], ["tweet"], version: 34, ttl: "1d") == "/#{@test_index}/_mapping/tweet?version=34&ttl=1d"
   end
@@ -64,12 +71,15 @@ defmodule Elastix.MappingTest do
     assert response.status_code == 404
   end
 
-  test "get with non existing mapping should return nothing" do
+  test "get with non existing mapping" do
     Index.create @test_url, @test_index, %{}
     {:ok, response} = Mapping.get @test_url, @test_index, "message"
 
-    assert response.status_code == 404
-    assert response.body == %{}
+    if elasticsearch_version() >= {5,5,0} do
+      assert response.body["error"]["reason"] == "type[[message]] missing"
+    else
+      assert response.body == %{}
+    end
   end
 
   test "get mapping should return mapping" do
