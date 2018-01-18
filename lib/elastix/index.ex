@@ -1,29 +1,30 @@
 defmodule Elastix.Index do
   @moduledoc """
   """
+  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.HTTP
 
   @doc false
   def create(elastic_url, name, data) do
-    elastic_url <> make_path(name)
+    prepare_url(elastic_url, name)
     |> HTTP.put(Poison.encode!(data))
   end
 
   @doc false
   def delete(elastic_url, name) do
-    elastic_url <> make_path(name)
+    prepare_url(elastic_url, name)
     |> HTTP.delete
   end
 
   @doc false
   def get(elastic_url, name) do
-    elastic_url <> make_path(name)
+    prepare_url(elastic_url, name)
     |> HTTP.get
   end
 
   @doc false
   def exists?(elastic_url, name) do
-    case elastic_url <> make_path(name) |> HTTP.head do
+    case prepare_url(elastic_url, name) |> HTTP.head do
       {:ok, response} ->
         case response.status_code do
           200 -> {:ok, true}
@@ -35,12 +36,7 @@ defmodule Elastix.Index do
 
   @doc false
   def refresh(elastic_url, name) do
-    elastic_url <> make_path(name) <> make_path("_refresh")
+    prepare_url(elastic_url, [name, "_refresh"])
     |> HTTP.post("")
-  end
-
-  @doc false
-  def make_path(name) do
-    "/#{name}"
   end
 end
