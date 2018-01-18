@@ -1,6 +1,7 @@
 defmodule Elastix.Mapping do
   @moduledoc """
   """
+  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.HTTP
 
   @doc false
@@ -15,7 +16,7 @@ defmodule Elastix.Mapping do
 
   @doc false
   def put(elastic_url, index_names, type_name, data, query_params) when is_list(index_names) do
-    elastic_url <> make_path(index_names, [type_name], query_params)
+    prepare_url(elastic_url, make_path(index_names, [type_name], query_params))
     |> HTTP.put(Poison.encode!(data))
   end
 
@@ -46,7 +47,7 @@ defmodule Elastix.Mapping do
 
   @doc false
   def get(elastic_url, index_names, type_names, query_params) when is_list(type_names) and is_list(index_names) do
-    elastic_url <> make_path(index_names, type_names, query_params)
+    prepare_url(elastic_url, make_path(index_names, type_names, query_params))
     |> HTTP.get
   end
 
@@ -72,7 +73,7 @@ defmodule Elastix.Mapping do
 
   @doc false
   def get_all(elastic_url, query_params) do
-    elastic_url <> make_all_path(query_params)
+    prepare_url(elastic_url, make_all_path(query_params))
     |> HTTP.get
   end
 
@@ -88,7 +89,7 @@ defmodule Elastix.Mapping do
 
   @doc false
   def get_all_with_type(elastic_url, type_names, query_params) when is_list(type_names) do
-    elastic_url <> make_all_path(type_names, query_params)
+    prepare_url(elastic_url, make_all_path(type_names, query_params))
     |> HTTP.get
   end
 

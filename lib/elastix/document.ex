@@ -1,6 +1,7 @@
 defmodule Elastix.Document do
   @moduledoc """
   """
+  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.HTTP
 
   @doc false
@@ -10,7 +11,7 @@ defmodule Elastix.Document do
 
   @doc false
   def index(elastic_url, index_name, type_name, id, data, query_params) do
-    elastic_url <> make_path(index_name, type_name, query_params, id)
+    prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
     |> HTTP.put(Poison.encode!(data))
   end
 
@@ -21,7 +22,7 @@ defmodule Elastix.Document do
 
   @doc false
   def index_new(elastic_url, index_name, type_name, data, query_params) do
-    elastic_url <> make_path(index_name, type_name, query_params)
+    prepare_url(elastic_url, make_path(index_name, type_name, query_params))
     |> HTTP.post(Poison.encode!(data))
   end
 
@@ -32,7 +33,7 @@ defmodule Elastix.Document do
 
   @doc false
   def get(elastic_url, index_name, type_name, id, query_params) do
-    elastic_url <> make_path(index_name, type_name, query_params, id)
+    prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
     |> HTTP.get
   end
 
@@ -43,7 +44,7 @@ defmodule Elastix.Document do
     path = [index_name, type_name]
       |> Enum.filter(fn v -> v end) # Filter out nils.
       |> Enum.join("/")
-    url = elastic_url <> "/#{path}/_mget"
+    url = prepare_url(elastic_url, [path, "_mget"])
       |> add_query_params(query_params)
 
     # HTTPoison does not provide an API for a GET request with a body.
@@ -52,7 +53,7 @@ defmodule Elastix.Document do
 
   @doc false
   def delete(elastic_url, index_name, type_name, id, query_params \\ []) do
-    elastic_url <> make_path(index_name, type_name, query_params, id)
+    prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
     |> HTTP.delete
   end
 
@@ -60,14 +61,15 @@ defmodule Elastix.Document do
   Uses the Delete By Query API.
   """
   def delete_matching(elastic_url, index_name, %{}=query, query_params \\ []) do
-    elastic_url <> "/#{index_name}/_delete_by_query"
+    prepare_url(elastic_url, [index_name, "_delete_by_query"])
     |> add_query_params(query_params)
     |> HTTP.post(Poison.encode!(query))
   end
 
   @doc false
   def update(elastic_url, index_name, type_name, id, data, query_params \\ []) do
-    elastic_url <> make_path(index_name, type_name, query_params, id, "_update")
+    elastic_url
+    |> prepare_url(make_path(index_name, type_name, query_params, id, "_update"))
     |> HTTP.post(Poison.encode!(data))
   end
 
