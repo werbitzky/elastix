@@ -130,17 +130,22 @@ Currently we can
   * optionally use shield for authentication ([shield](https://www.elastic.co/products/shield))
   * optionally pass along custom headers for every request made to the elasticsearch server(s)s
   * optionally pass along options to [HTTPoison](https://github.com/edgurgel/httpoison)
+  * optionally use a different JSON library
 
 by setting the respective keys in your `config/config.exs`
 
 ```elixir
 config :elastix,
-  poison_options: [keys: :atoms],
+  json_options: [keys: :atoms],
   shield: true,
   username: "username",
   password: "password",
   httpoison_options: [hackney: [pool: :elastix_pool]]
 ```
+
+The above for example will
+  * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
+  * use shield for authentication
 
 ### Custom headers
 
@@ -172,9 +177,28 @@ defmodule MyModule do
 end
 ```
 
-The above for example will
-  * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
-  * use shield for authentication
+### Override the default JSON library
+
+To use a different JSON library you must pass in the json_codec option.
+
+For example:
+
+```elixir
+config :elastix,
+  json_codec: JiffyCodec,
+  json_options: [:return_maps]
+```
+
+This must be a module that implements the [Elastix.JSON.Codec](lib/elastix/json.ex) behavior.  For example:
+
+```elixir
+defmodule JiffyCodec do
+  @behaviour Elastix.JSON.Codec
+
+  def encode!(data), do: :jiffy.encode(data)
+  def decode(json, opts \\ []), do: {:ok, :jiffy.decode(json, opts)}
+end
+```
 
 ## Running tests
 

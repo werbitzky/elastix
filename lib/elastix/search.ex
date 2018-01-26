@@ -2,7 +2,7 @@ defmodule Elastix.Search do
   @moduledoc """
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.HTTP
+  alias Elastix.{HTTP, JSON}
 
   @doc false
   def search(elastic_url, index, types, data) do
@@ -12,13 +12,13 @@ defmodule Elastix.Search do
   @doc false
   def search(elastic_url, index, types, data, query_params, options \\ []) do
     prepare_url(elastic_url, make_path(index, types, query_params))
-    |> HTTP.post(Poison.encode!(data), [], options)
+    |> HTTP.post(JSON.encode!(data), [], options)
   end
 
   @doc false
   def scroll(elastic_url, data, options \\ []) do
     prepare_url(elastic_url, "_search/scroll")
-    |> HTTP.post(Poison.encode!(data), [], options)
+    |> HTTP.post(JSON.encode!(data), [], options)
   end
 
   @doc false
@@ -29,7 +29,7 @@ defmodule Elastix.Search do
   @doc false
   def count(elastic_url, index, types, data, query_params, options \\ []) do
     elastic_url <> make_path(index, types, query_params, "_count")
-    |> HTTP.post(Poison.encode!(data), [], options)
+    |> HTTP.post(JSON.encode!(data), [], options)
   end
 
   @doc false
