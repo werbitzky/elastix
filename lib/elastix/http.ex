@@ -2,6 +2,7 @@ defmodule Elastix.HTTP do
   @moduledoc """
   """
   use HTTPoison.Base
+  alias Elastix.JSON
 
   @doc false
   def prepare_url(url, path) when is_binary(path),
@@ -42,14 +43,10 @@ defmodule Elastix.HTTP do
   @doc false
   def process_response_body(""), do: ""
   def process_response_body(body) do
-    case body |> to_string |> Poison.decode(poison_options()) do
+    case body |> to_string |> JSON.decode() do
       {:error, _} -> body
       {:ok, decoded} -> decoded
     end
-  end
-
-  defp poison_options do
-    Elastix.config(:poison_options, [])
   end
 
   defp default_httpoison_options do

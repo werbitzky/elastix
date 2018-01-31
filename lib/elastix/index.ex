@@ -2,12 +2,12 @@ defmodule Elastix.Index do
   @moduledoc """
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.HTTP
+  alias Elastix.{HTTP, JSON}
 
   @doc false
   def create(elastic_url, name, data) do
     prepare_url(elastic_url, name)
-    |> HTTP.put(Poison.encode!(data))
+    |> HTTP.put(JSON.encode!(data))
   end
 
   @doc false
