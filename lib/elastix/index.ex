@@ -39,4 +39,16 @@ defmodule Elastix.Index do
     prepare_url(elastic_url, [name, "_refresh"])
     |> HTTP.post("")
   end
+
+  @doc false
+  def open(elastic_url, name) do
+    prepare_url(elastic_url, [name, "_open"])
+    |> HTTP.post("")
+  end
+
+  @doc false
+  def close(elastic_url, name) do
+    prepare_url(elastic_url, [name, "_close"])
+    |> HTTP.post("")
+  end
 end
