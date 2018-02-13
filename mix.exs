@@ -18,7 +18,7 @@ defmodule Elastix.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :httpoison]]
+    [applications: [:logger, :httpoison, :retry]]
   end
 
   # Dependencies can be Hex packages:
@@ -35,7 +35,8 @@ defmodule Elastix.Mixfile do
      {:credo, "~> 0.6", only: [:dev, :test]},
      {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
      {:poison, "~> 3.1", optional: true},
-     {:httpoison, ">= 0.7.0"}]
+     {:httpoison, ">= 0.7.0"},
+     {:retry, "~>0.8"}]
   end
 
   defp package do
