@@ -6,7 +6,7 @@ elixir:
 services:
   - elasticsearch
 before_script:
-  - 'echo "path.repo /tmp" | sudo tee -a /etc/elasticsearch/elasticsearch.yml'
+  - 'echo "path.repo: /tmp" | sudo tee -a /etc/elasticsearch/elasticsearch.yml'
   - 'sudo service elasticsearch restart'
 script: "mix test"
 notifications:

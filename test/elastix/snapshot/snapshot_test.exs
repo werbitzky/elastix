@@ -5,7 +5,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
   Note that for these tests to run, Elasticsearch must be running and the
   elasticsearch.yml file must have the following entry:
 
-    path.repo /tmp
+    path.repo: /tmp
 
   For testing purposes, snapshots are limited to test indices only.
   """

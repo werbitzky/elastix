@@ -5,7 +5,7 @@ defmodule Elastix.Snapshot.RepositoryTest do
   Note that for these tests to run, Elasticsearch must be running and the
   elasticsearch.yml file must have the following entry:
 
-    path.repo /tmp
+    path.repo: /tmp
   """
 
   use ExUnit.Case
