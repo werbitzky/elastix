@@ -11,6 +11,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
   """
 
   use ExUnit.Case
+  use Retry
   alias Elastix.Index
   alias Elastix.Snapshot.{Repository, Snapshot}
 
@@ -20,15 +21,20 @@ defmodule Elastix.Snapshot.SnapshotTest do
   setup_all do
     Index.create(@test_url, "elastix_test_index_1", %{})
     Index.create(@test_url, "elastix_test_index_2", %{})
+    Index.create(@test_url, "elastix_test_index_3", %{})
+    Index.create(@test_url, "elastix_test_index_4", %{})
+    Index.create(@test_url, "elastix_test_index_5", %{})
+    Repository.register(@test_url, @test_repository, %{type: "fs", settings: %{location: "/tmp"}})
 
-    Repository.register(@test_url, @test_repository, %{
-      type: "fs",
-      settings: %{
-        location: "/tmp",
-        max_snapshot_bytes_per_sec: "200mb",
-        max_restore_bytes_per_sec: "200mb"
-      }
-    })
+    on_exit(fn ->
+      Index.delete(@test_url, "elastix_test_index_1")
+      Index.delete(@test_url, "elastix_test_index_2")
+      Index.delete(@test_url, "elastix_test_index_3")
+      Index.delete(@test_url, "elastix_test_index_4")
+      Index.delete(@test_url, "elastix_test_index_5")
+
+      Repository.delete(@test_url, @test_repository)
+    end)
 
     :ok
   end
@@ -37,6 +43,9 @@ defmodule Elastix.Snapshot.SnapshotTest do
     on_exit(fn ->
       Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_1")
       Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_2")
+      Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_3")
+      Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_4")
+      Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_5")
     end)
 
     :ok
@@ -60,120 +69,183 @@ defmodule Elastix.Snapshot.SnapshotTest do
 
   describe "creating a snapshot" do
     test "a snapshot of multiple indices in the cluster" do
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.create(
-                 @test_url,
-                 @test_repository,
-                 "elastix_test_snapshot_1",
-                 %{
-                   indices: ["elastix_test_index_1", "elastix_test_index_2"]
-                 },
-                 wait_for_completion: true
-               )
+      Snapshot.create(
+        @test_url,
+        @test_repository,
+        "elastix_test_snapshot_2",
+        %{indices: "elastix_test_index_1,elastix_test_index_2"},
+        wait_for_completion: true
+      )
 
-      Process.sleep(1000)
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        (
+          {:ok, %{body: %{"snapshots" => snapshots}}} =
+            Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_2")
 
-      assert {:ok, %{body: %{"snapshots" => snapshots}}} =
-               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_1")
+          snapshot = List.first(snapshots)
+          snapshot["state"] == "SUCCESS"
+        )
 
-      snapshot =
-        Enum.find(snapshots, fn snapshot -> snapshot["snapshot"] == "elastix_test_snapshot_1" end)
+        then
 
-      assert Enum.member?(snapshot["indices"], "elastix_test_index_1")
-      assert Enum.member?(snapshot["indices"], "elastix_test_index_2")
+        (
+          {:ok, %{body: %{"snapshots" => snapshots}}} =
+            Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_2")
+
+          snapshot = List.first(snapshots)
+          assert Enum.member?(snapshot["indices"], "elastix_test_index_1")
+          assert Enum.member?(snapshot["indices"], "elastix_test_index_2")
+        )
+      end
     end
 
     test "a snapshot of a single index in the cluster" do
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.create(
-                 @test_url,
-                 @test_repository,
-                 "elastix_test_snapshot_1",
-                 %{
-                   indices: ["elastix_test_index_1"]
-                 },
-                 wait_for_completion: true
-               )
+      Snapshot.create(
+        @test_url,
+        @test_repository,
+        "elastix_test_snapshot_1",
+        %{indices: "elastix_test_index_1"},
+        wait_for_completion: true
+      )
 
-      Process.sleep(1000)
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        (
+          {:ok, %{body: %{"snapshots" => snapshots}}} =
+            Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_1")
 
-      assert {:ok, %{body: %{"snapshots" => snapshots}}} =
-               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_1")
+          snapshot = List.first(snapshots)
+          snapshot["state"] == "SUCCESS"
+        )
 
-      snapshot =
-        Enum.find(snapshots, fn snapshot -> snapshot["snapshot"] == "elastix_test_snapshot_1" end)
+        then
 
-      assert Enum.member?(snapshot["indices"], "elastix_test_index_1")
-      refute Enum.member?(snapshot["indices"], "elastix_test_index_2")
+        (
+          {:ok, %{body: %{"snapshots" => snapshots}}} =
+            Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_1")
+
+          snapshot = List.first(snapshots)
+          assert Enum.member?(snapshot["indices"], "elastix_test_index_1")
+          refute Enum.member?(snapshot["indices"], "elastix_test_index_2")
+        )
+      end
     end
   end
 
   describe "restoring a snapshot" do
     test "all indices in a snapshot" do
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.create(
-                 @test_url,
-                 @test_repository,
-                 "elastix_test_snapshot_1",
-                 %{indices: ["elastix_test_index_1", "elastix_test_index_2"]},
-                 wait_for_completion: true
-               )
+      Snapshot.create(
+        @test_url,
+        @test_repository,
+        "elastix_test_snapshot_4",
+        %{indices: "elastix_test_index_1,elastix_test_index_2"},
+        wait_for_completion: true
+      )
 
-      Process.sleep(1000)
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        (
+          {:ok, %{body: %{"snapshots" => snapshots}}} =
+            Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_4")
 
-      Index.delete(@test_url, "elastix_test_index_1")
-      Index.delete(@test_url, "elastix_test_index_2")
+          snapshot = List.first(snapshots)
+          snapshot["state"] == "SUCCESS"
+        )
 
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.restore(@test_url, @test_repository, "elastix_test_snapshot_1")
+        then
 
-      assert {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_1")
-      assert {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_2")
+        (
+          Index.close(@test_url, "elastix_test_index_1")
+          Index.close(@test_url, "elastix_test_index_2")
+          Index.delete(@test_url, "elastix_test_index_1")
+          Index.delete(@test_url, "elastix_test_index_2")
+        )
+      end
+
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        (
+          {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_1")
+          {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_2")
+        )
+
+        then
+        Snapshot.restore(@test_url, @test_repository, "elastix_test_snapshot_4", %{partial: true})
+      end
+
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_1")
+        {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_2")
+      end
     end
 
     test "a specific index in a snapshot" do
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.create(
-                 @test_url,
-                 @test_repository,
-                 "elastix_test_snapshot_1",
-                 %{indices: ["elastix_test_index_1", "elastix_test_index_2"]},
-                 wait_for_completion: true
-               )
+      Snapshot.create(
+        @test_url,
+        @test_repository,
+        "elastix_test_snapshot_3",
+        %{indices: "elastix_test_index_3,elastix_test_index_4"},
+        wait_for_completion: true
+      )
 
-      Process.sleep(1000)
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        (
+          {:ok, %{status_code: 200, body: %{"snapshots" => snapshots}}} =
+            Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_3")
 
-      Index.delete(@test_url, "elastix_test_index_1")
-      Index.delete(@test_url, "elastix_test_index_2")
+          snapshot = List.first(snapshots)
+          snapshot["state"] == "SUCCESS"
+        )
 
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.restore(@test_url, @test_repository, "elastix_test_snapshot_1", %{
-                 indices: "elastix_test_index_1"
-               })
+        then
 
-      assert {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_1")
-      assert {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_2")
+        (
+          Index.close(@test_url, "elastix_test_index_3")
+          Index.close(@test_url, "elastix_test_index_4")
+          Index.delete(@test_url, "elastix_test_index_3")
+          Index.delete(@test_url, "elastix_test_index_4")
+        )
+      end
+
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        (
+          {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_3")
+          {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_4")
+        )
+
+        then
+
+        Snapshot.restore(@test_url, @test_repository, "elastix_test_snapshot_3", %{
+          indices: "elastix_test_index_3"
+        })
+      end
+
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_3")
+        {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_4")
+      end
     end
   end
 
   describe "retrieving status information for a snapshot" do
     test "snapshot doesn't exist" do
-      assert {:ok, %{status_code: 404}} = Snapshot.get(@test_url, @test_repository, "nonexistent")
+      assert {:ok, %{status_code: 404}} = Snapshot.status(@test_url, @test_repository, "nonexistent")
     end
 
     test "information about all snapshots" do
-      assert {:ok, %{status_code: 200}} = Snapshot.get(@test_url)
+      assert {:ok, %{status_code: 200}} = Snapshot.status(@test_url)
     end
 
     test "information about all snapshots in a repository" do
-      assert {:ok, %{status_code: 200}} = Snapshot.get(@test_url, @test_repository)
+      assert {:ok, %{status_code: 200}} = Snapshot.status(@test_url, @test_repository)
     end
 
     test "information about a specific snapshot" do
-      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_1")
+      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_5", %{
+        indices: "elastix_test_index_5"
+      })
 
-      assert {:ok, %{status_code: 200}} =
-               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_1")
+      wait lin_backoff(500, 1) |> expiry(5_000) do
+        {:ok, %{status_code: 200}} =
+          Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_5")
+        end
     end
   end
 
@@ -183,19 +255,16 @@ defmodule Elastix.Snapshot.SnapshotTest do
     end
 
     test "information about all snapshots" do
-      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_1")
-      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_2")
-
       assert {:ok, %{status_code: 200}} = Snapshot.get(@test_url, @test_repository)
     end
 
     test "information about a specific snapshot" do
-      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_1", %{
-        indices: ["elastix_test_index_1", "elastix_test_index_2"]
+      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_5", %{
+        indices: "elastix_test_index_5"
       })
 
       assert {:ok, %{status_code: 200}} =
-               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_1")
+               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_5")
     end
   end
 
@@ -206,15 +275,15 @@ defmodule Elastix.Snapshot.SnapshotTest do
     end
 
     test "snapshot is deleted" do
-      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_1", %{
-        indices: ["elastix_test_index_1", "elastix_test_index_2"]
+      Snapshot.create(@test_url, @test_repository, "elastix_test_snapshot_5", %{
+        indices: "elastix_test_index_5"
       })
 
       assert {:ok, %{status_code: 200}} =
-               Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_1")
+               Snapshot.delete(@test_url, @test_repository, "elastix_test_snapshot_5")
 
       assert {:ok, %{status_code: 404}} =
-               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_1")
+               Snapshot.get(@test_url, @test_repository, "elastix_test_snapshot_5")
     end
   end
 end
