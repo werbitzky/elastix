@@ -2,6 +2,8 @@ defmodule Elastix.Snapshot.Repository do
   @moduledoc """
   Functions for working with repositories. A repository is required for taking
   and restoring snapshots of indices.
+
+  [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html)
   """
 
   import Elastix.HTTP, only: [prepare_url: 2]

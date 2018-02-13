@@ -1,6 +1,8 @@
 defmodule Elastix.Snapshot.Snapshot do
   @moduledoc """
   Functions for working with snapshots.
+
+  [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html)
   """
 
   import Elastix.HTTP, only: [prepare_url: 2]
