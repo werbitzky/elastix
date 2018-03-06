@@ -1,3 +1,9 @@
+## 0.7.0
+
+### Improvements
+
+ - Add support for custom httpoison options on bulk calls
+
 ## 0.6.1
 
 ### Improvements

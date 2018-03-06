@@ -31,9 +31,11 @@ defmodule Elastix.Bulk do
       Keyword.get(options, :index)
       |> make_path(Keyword.get(options, :type), query_params)
 
+    httpoison_options = Keyword.get(options, :httpoison_options, [])
+
     elastic_url
     |> prepare_url(path)
-    |> HTTP.put(data)
+    |> HTTP.put(data, [], httpoison_options)
   end
 
   @doc """
@@ -50,9 +52,11 @@ defmodule Elastix.Bulk do
       "This function is deprecated and will be removed in future releases; use Elastix.Bulk.post/4 instead."
     )
 
+    httpoison_options = Keyword.get(options, :httpoison_options, [])
+
     (elastic_url <>
        make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params))
-    |> HTTP.put(Enum.map(lines, fn line -> JSON.encode!(line) <> "\n" end))
+    |> HTTP.put(Enum.map(lines, fn line -> JSON.encode!(line) <> "\n" end), [], httpoison_options)
   end
 
   @doc """
@@ -66,9 +70,12 @@ defmodule Elastix.Bulk do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def post_raw(elastic_url, raw_data, options \\ [], query_params \\ []) do
+
+    httpoison_options = Keyword.get(options, :httpoison_options, [])
+
     (elastic_url <>
        make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params))
-    |> HTTP.put(raw_data)
+    |> HTTP.put(raw_data, [], httpoison_options)
   end
 
   @doc false

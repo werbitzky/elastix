@@ -27,6 +27,17 @@ defmodule Elastix.BulkTest do
     assert Bulk.make_path(nil, nil, version: 34, ttl: "1d") == "/_bulk?version=34&ttl=1d"
   end
 
+  test "bulk accepts httpoison options" do
+    lines = [
+        %{index: %{_id: "1"}},
+        %{field: "value1"},
+        %{index: %{_id: "2"}},
+        %{field: "value2"}
+      ]
+    {:error, %HTTPoison.Error{reason: :timeout}} =
+      Bulk.post @test_url, lines, index: @test_index, type: "message", httpoison_options: [recv_timeout: 0]
+  end
+
   describe "test bulks with index and type in URL" do
     setup do
       {:ok,
