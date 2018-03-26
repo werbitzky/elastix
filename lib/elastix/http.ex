@@ -1,8 +1,11 @@
 defmodule Elastix.HTTP do
   @moduledoc """
+  A thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper.
   """
   use HTTPoison.Base
   alias Elastix.JSON
+
+  @type resp :: {:ok, HTTPoison.Response.t()} | {:error, HTTPoison.Error.t()}
 
   @doc false
   def prepare_url(url, path) when is_binary(path),

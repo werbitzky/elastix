@@ -1,98 +1,69 @@
 # Elastix [![Hex Version](https://img.shields.io/hexpm/v/elastix.svg)](https://hex.pm/packages/elastix) [![Hex Downloads](https://img.shields.io/hexpm/dt/elastix.svg)](https://hex.pm/packages/elastix) [![Build Status](https://travis-ci.org/werbitzky/elastix.svg)](https://travis-ci.org/werbitzky/elastix) [![WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/wtfpl)
 
-A simple Elastic REST client written in Elixir.
+A DSL-free Elasticsearch client for Elixir.
 
-## Preface
+## Documentation
 
-* [Official Elastic Website](https://www.elastic.co)
-* [and latest docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+* [Documentation on hexdocs.pm](https://hexdocs.pm/elastix/)
+* [Latest Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 
-This library talks to the Elastic(search) server through the HTTP/REST/JSON API. Its methods almost always return a [HTTPoison](https://github.com/edgurgel/httpoison) request object.
+Even though the [documentation](https://hexdocs.pm/elastix/) is pretty scarce right now, we're working on improving it. If you want to help with that you're definitely welcome 🤗
 
-When needed, the payload can be provided as an Elixir Map, which is internally converted to JSON. The library does not assume anything else regarding the payload and also does not (and will never) provide a magic DSL to generate the payload. That way users can directly manipulate the API data, that is sent to the Elastic server.
+This README contains most of the information you should need to get started, if you can't find what you're looking for, either look at the tests or file an issue!
 
-## Overview
+## Installation
 
-Elastix has *5 main modules* and one *utility module*, that can be used, if the call/feature you want is not implemented (yet). However – please open issues or provide pull requests so I can improve the software for everybody. The modules are:
-
-* [Elastix.Index](lib/elastix/index.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
-* [Elastix.Document](lib/elastix/document.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
-* [Elastix.Search](lib/elastix/search.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
-* [Elastix.Bulk](lib/elastix/bulk.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
-* [Elastix.Mapping](lib/elastix/mapping.ex) corresponding to: [this official API Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
-* and [Elastix.HTTP](lib/elastix/http.ex) – a thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper
-
-I will try and provide documentation and examples for all of them with time, for now just consult the source code.
-
-## Simple Example
-
-start elastix application dependencies (or define it as an application dependency in ```mix.exs```):
+Add `elastix` to your list of dependencies in `mix.exs`:
 
 ```elixir
-Elastix.start()
-
+def deps do
+  [{:elastix, ">= 0.0.0"}]
+end
 ```
 
-create the Elastic index
+Then run `mix deps.get` to fetch the new dependency.
+
+## Examples
+
+### Creating an Elasticsearch index
 
 ```elixir
-Elastix.Index.create("http://127.0.0.1:9200", "sample_index_name", %{})
-
+Elastix.Index.create("http://localhost:9200", "twitter", %{})
 ```
 
-assuming you have a model ```product``` create a document, search, or delete
+### Map, Index, Search and Delete
 
 ```elixir
+elastic_url = "http://localhost:9200"
 
-# Elastic Server URL
-elastic_url = "http://127.0.0.1:9200"
-
-# Elastic Index Name
-index_name = "shop_api_production"
-
-# Elastic Document Type
-doc_type = "product"
-
-index_data = %{
-  name: product.name,
-  item_number: product.item_number,
-  inserted_at: product.inserted_at,
-  updated_at: product.updated_at
+data = %{
+    user: "kimchy",
+    post_date: "2009-11-15T14:12:12",
+    message: "trying out Elastix"
 }
 
-# Add mapping
 mapping = %{
   properties: %{
-    name: %{type: "text"},
-    item_number: %{type: "integer"},
-    inserted_at: %{type: "date"},
-    updated_at: %{type: "date"}
+    user: %{type: "text"},
+    post_date: %{type: "date"},
+    message: %{type: "text"}
   }
 }
 
-# add some search params according to Elastic JSON API
-search_payload = %{}
-
-# which document types should be included in the search?
-search_in = [doc_type]
-
-Elastix.Mapping.put(elastic_url, index_name, doc_type, mapping)
-Elastix.Document.index(elastic_url, index_name, doc_type, product.id, index_data)
-Elastix.Search.search(elastic_url, index_name, search_in, search_payload)
-Elastix.Document.delete(elastic_url, index_name, doc_type, product.id)
-
+Elastix.Mapping.put(elastic_url, "twitter", "tweet", mapping)
+Elastix.Document.index(elastic_url, "twitter", "tweet", "42", data)
+Elastix.Search.search(elastic_url, "twitter", ["tweet"], %{})
+Elastix.Document.delete(elastic_url, "twitter", "tweet", "42")
 ```
 
-### Bulk request
+### Bulk requests
 
-It is possible to execute `bulk` requests with *elastix*.
+Bulk requests take as parameter a list of the lines you want to send to the [`_bulk`](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) endpoint.
 
-Bulk requests take as parameters the list of lines to send to *Elasticsearch*. You can also optionally give them options. Available options are:
+You can also specify the following options:
 
 * `index` the index of the request
 * `type` the document type of the request. *(you can't specify `type` without specifying `index`)*
-
-**Examples**
 
 ```elixir
 lines = [
@@ -102,68 +73,42 @@ lines = [
   %{field: "value2"}
 ]
 
-# Send bulk data
-Elastix.Bulk.post elastic_url, lines, index: "my_index", type: "my_type"
-# Send your lines by transforming them to iolist
-Elastix.Bulk.post_to_iolist elastic_url, lines, index: "my_index", type: "my_type"
+Elastix.Bulk.post(elastic_url, lines, index: "my_index", type: "my_type")
 
-# Send raw data directly to the API
+# You can also send raw data:
 data = Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end)
-
-Elastix.Bulk.post_raw elastic_url, data, index: "my_index", type: "my_type"
-
-# Finally, you can specify the index or the type directly in you lines
-lines = [
-  %{index: %{_id: "1", _index: "my_index", _type: "my_type"}},
-  %{field: "value1"},
-  %{index: %{_id: "2", _index: "my_other_index", _type: "my_other_type"}},
-  %{field: "value2"}
-]
-
-Elastix.Bulk.post elastic_url, lines
+Elastix.Bulk.post_raw(elastic_url, data, index: "my_index", type: "my_type")
 ```
 
 ## Configuration
 
-Currently we can
-  * pass options to the JSON decoder used by Elastix ([poison](https://github.com/devinus/poison))
-  * optionally use shield for authentication ([shield](https://www.elastic.co/products/shield))
-  * optionally pass along custom headers for every request made to the elasticsearch server(s)s
-  * optionally pass along options to [HTTPoison](https://github.com/edgurgel/httpoison)
-  * optionally use a different JSON library
-
-by setting the respective keys in your `config/config.exs`
+### [Shield](https://www.elastic.co/products/shield)
 
 ```elixir
 config :elastix,
-  json_options: [keys: :atoms],
   shield: true,
   username: "username",
   password: "password",
+```
+
+### [Poison](https://github.com/devinus/poison) (or any other JSON library) and [HTTPoison](https://github.com/edgurgel/httpoison)
+
+```elixir
+config :elastix,
+  json_options: [keys: :atoms!],
   httpoison_options: [hackney: [pool: :elastix_pool]]
 ```
 
-The above for example will
-  * lead to the HTTPoison responses being parsed into maps with atom keys instead of string keys (be careful as most of the time this is not a good idea as stated here: https://github.com/devinus/poison#parser).
-  * use shield for authentication
+Note that you can configure Elastix to use any JSON library, see the ["Custom JSON codec" page](https://hexdocs.pm/elastix/custom-json-codec.html) for more info.
 
 ### Custom headers
-
-To add custom headers to a request you must pass in the custom_headers option.
-
-For example:
 
 ```elixir
 config :elastix,
   custom_headers: {MyModule, :add_aws_signature, ["us-east"]}
 ```
 
-This must be a `{Module, :function, [args]}` tuple. The request will be added
-to the head of the args list. The args list may be empty. The request is a map
-with the `method`, `headers`, `url`, and `body` keys.
-
-The function you define should return the full set of headers you want to send,
-including any headers passed in. For example:
+`custom_headers` must be a tuple of the type `{Module, :function, [args]}`, where `:function` is a function that should accept the request (a map of this type: `%{method: String.t, headers: [], url: String.t, body: String.t}`) as its first parameter and return a list of the headers you want to send:
 
 ```elixir
 defmodule MyModule do
@@ -177,32 +122,9 @@ defmodule MyModule do
 end
 ```
 
-### Override the default JSON library
-
-To use a different JSON library you must pass in the json_codec option.
-
-For example:
-
-```elixir
-config :elastix,
-  json_codec: JiffyCodec,
-  json_options: [:return_maps]
-```
-
-This must be a module that implements the [Elastix.JSON.Codec](lib/elastix/json.ex) behavior.  For example:
-
-```elixir
-defmodule JiffyCodec do
-  @behaviour Elastix.JSON.Codec
-
-  def encode!(data), do: :jiffy.encode(data)
-  def decode(json, opts \\ []), do: {:ok, :jiffy.decode(json, opts)}
-end
-```
-
 ## Running tests
 
-You need elastic search running locally on port 9200. A quick way of running any version of elastic, is via docker:
+You need Elasticsearch running locally on port 9200. A quick way of doing so is via Docker:
 
 ```
 $ docker run -p 9200:9200 -it --rm elasticsearch:5.1.2
@@ -219,7 +141,6 @@ $ mix test
 
 ## License
 
-Copyright © 2017 El Werbitzky <werbitzky@gmail.com>
-This work is free. You can redistribute it and/or modify it under the
-terms of the Do What The Fuck You Want To Public License, Version 2,
-as published by Sam Hocevar. See [http://www.wtfpl.net/](http://www.wtfpl.net/) for more details.
+Copyright © 2017 El Werbitzky werbitzky@gmail.com
+
+This work is free. You can redistribute it and/or modify it under the terms of the Do What The Fuck You Want To Public License, Version 2, as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
