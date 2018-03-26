@@ -22,13 +22,18 @@ defmodule Elastix.Bulk do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def post(elastic_url, lines, options \\ [], query_params \\ []) do
+    data =
+      Enum.reduce(lines, [], fn l, acc -> ["\n", JSON.encode!(l) | acc] end)
+      |> Enum.reverse()
+      |> IO.iodata_to_binary()
+
+    path =
+      Keyword.get(options, :index)
+      |> make_path(Keyword.get(options, :type), query_params)
+
     elastic_url
-    |> prepare_url(make_path(
-      Keyword.get(options, :index), Keyword.get(options, :type), query_params))
-    |> HTTP.put(
-      Enum.reduce(
-        lines, "",
-        fn (line, payload) -> payload <> JSON.encode!(line) <> "\n" end))
+    |> prepare_url(path)
+    |> HTTP.put(data)
   end
 
   @doc """
@@ -61,14 +66,14 @@ defmodule Elastix.Bulk do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def post_raw(elastic_url, raw_data, options \\ [], query_params \\ []) do
-    elastic_url <> make_path(
-      Keyword.get(options, :index), Keyword.get(options, :type), query_params)
+    (elastic_url <>
+       make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params))
     |> HTTP.put(raw_data)
   end
 
   @doc false
   def make_path(index_name, type_name, query_params) do
-    path = _make_base_path(index_name, type_name)
+    path = make_base_path(index_name, type_name)
 
     case query_params do
       [] -> path

@@ -61,7 +61,7 @@ defmodule Elastix.JSON do
     end
   end
 
-  defp codec() do
+  defp codec do
     Elastix.config(:json_codec, Poison)
   end
 end

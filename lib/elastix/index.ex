@@ -32,7 +32,7 @@ defmodule Elastix.Index do
   @spec delete(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def delete(elastic_url, name) do
     prepare_url(elastic_url, name)
-    |> HTTP.delete
+    |> HTTP.delete()
   end
 
   @doc """
@@ -46,7 +46,7 @@ defmodule Elastix.Index do
   @spec get(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def get(elastic_url, name) do
     prepare_url(elastic_url, name)
-    |> HTTP.get
+    |> HTTP.get()
   end
 
   @doc """
@@ -63,13 +63,15 @@ defmodule Elastix.Index do
   """
   @spec exists?(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def exists?(elastic_url, name) do
-    case prepare_url(elastic_url, name) |> HTTP.head do
+    case prepare_url(elastic_url, name) |> HTTP.head() do
       {:ok, response} ->
         case response.status_code do
           200 -> {:ok, true}
           404 -> {:ok, false}
         end
-      err -> err
+
+      err ->
+        err
     end
   end
 

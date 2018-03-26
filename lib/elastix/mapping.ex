@@ -53,7 +53,7 @@ defmodule Elastix.Mapping do
   def get(elastic_url, index_names, type_names, query_params)
       when is_list(type_names) and is_list(index_names) do
     prepare_url(elastic_url, make_path(index_names, type_names, query_params))
-    |> HTTP.get
+    |> HTTP.get()
   end
 
   def get(elastic_url, index_names, type_name, query_params)
@@ -80,7 +80,7 @@ defmodule Elastix.Mapping do
   @spec get_all(elastic_url :: String.t(), query_params :: Keyword.t()) :: HTTP.resp()
   def get_all(elastic_url, query_params \\ []) do
     prepare_url(elastic_url, make_all_path(query_params))
-    |> HTTP.get
+    |> HTTP.get()
   end
 
   @doc """
@@ -101,7 +101,7 @@ defmodule Elastix.Mapping do
   def get_all_with_type(elastic_url, type_names, query_params)
       when is_list(type_names) do
     prepare_url(elastic_url, make_all_path(type_names, query_params))
-    |> HTTP.get
+    |> HTTP.get()
   end
 
   def get_all_with_type(elastic_url, type_name, query_params),
@@ -109,8 +109,8 @@ defmodule Elastix.Mapping do
 
   @doc false
   def make_path(index_names, type_names, query_params) do
-    index_names = Enum.join index_names, ","
-    type_names = Enum.join type_names, ","
+    index_names = Enum.join(index_names, ",")
+    type_names = Enum.join(type_names, ",")
 
     path = "/#{index_names}/_mapping/#{type_names}"
 
@@ -132,7 +132,7 @@ defmodule Elastix.Mapping do
 
   @doc false
   def make_all_path(type_names, query_params) do
-    type_names = Enum.join type_names, ","
+    type_names = Enum.join(type_names, ",")
 
     path = "/_mapping/#{type_names}"
 

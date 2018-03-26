@@ -65,7 +65,7 @@ defmodule Elastix.Document do
         ) :: HTTP.resp()
   def get(elastic_url, index_name, type_name, id, query_params \\ []) do
     prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
-    |> HTTP.get
+    |> HTTP.get()
   end
 
   @doc """
@@ -80,8 +80,9 @@ defmodule Elastix.Document do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def mget(elastic_url, query, index_name \\ nil, type_name \\ nil, query_params \\ []) do
-    path = [index_name, type_name]
-      |> Enum.filter(fn v -> v end) # Filter out nils.
+    path =
+      [index_name, type_name]
+      |> Enum.reject(&is_nil/1)
       |> Enum.join("/")
 
     url =
@@ -109,7 +110,7 @@ defmodule Elastix.Document do
         ) :: HTTP.resp()
   def delete(elastic_url, index_name, type_name, id, query_params \\ []) do
     prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
-    |> HTTP.delete
+    |> HTTP.delete()
   end
 
   @doc """
