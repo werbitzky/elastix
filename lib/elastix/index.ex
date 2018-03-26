@@ -87,4 +87,34 @@ defmodule Elastix.Index do
     prepare_url(elastic_url, [name, "_refresh"])
     |> HTTP.post("")
   end
+
+  @doc """
+  [Opens](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
+  the specified index.
+
+  ## Examples
+
+      iex> Elastix.Index.open("http://localhost:9200", "twitter")
+      {:ok, %HTTPoison.Response{...}}
+  """
+  @spec open(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
+  def open(elastic_url, name) do
+    prepare_url(elastic_url, [name, "_open"])
+    |> HTTP.post("")
+  end
+
+  @doc """
+  [Closes](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
+  the specified index.
+
+  ## Examples
+
+      iex> Elastix.Index.close("http://localhost:9200", "twitter")
+      {:ok, %HTTPoison.Response{...}}
+  """
+  @spec close(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
+  def close(elastic_url, name) do
+    prepare_url(elastic_url, [name, "_close"])
+    |> HTTP.post("")
+  end
 end
