@@ -1,3 +1,16 @@
+## 0.6.0
+
+### Improvements
+
+  - Add a JSON wrapper module allowing to use any JSON codec library
+  - Add functions to handle snapshots
+  - Add `open` and `close` to the Index module
+  - Improve documentation and add specs to public functions
+  - Allow to use the `_msearch` endpoint via `Elastix.Search.search`.
+  - Deprecate `Elastix.Bulk.post_to_iolist/4` as `Elastix.Bulk.post` does mostly the same thing
+  - Add `count` to the Search module
+  - Allow trailing slashes in URL
+
 ## 0.5.0
 
 ### Improvements
