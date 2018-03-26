@@ -5,7 +5,7 @@ defmodule Elastix.Mapping do
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.HTTP
+  alias Elastix.{HTTP, JSON}
 
   @doc """
   Creates a new mapping.
@@ -116,7 +116,7 @@ defmodule Elastix.Mapping do
 
     case query_params do
       [] -> path
-      _ -> add_query_params(path, query_params)
+      _ -> HTTP.append_query_string(path, query_params)
     end
   end
 
@@ -126,7 +126,7 @@ defmodule Elastix.Mapping do
 
     case query_params do
       [] -> path
-      _ -> add_query_params(path, query_params)
+      _ -> HTTP.append_query_string(path, query_params)
     end
   end
 
@@ -138,16 +138,7 @@ defmodule Elastix.Mapping do
 
     case query_params do
       [] -> path
-      _ -> add_query_params(path, query_params)
+      _ -> HTTP.append_query_string(path, query_params)
     end
-  end
-
-  @doc false
-  defp add_query_params(path, query_params) do
-    query_string = Enum.map_join query_params, "&", fn(param) ->
-      "#{elem(param, 0)}=#{elem(param, 1)}"
-    end
-
-    "#{path}?#{query_string}"
   end
 end

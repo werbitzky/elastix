@@ -121,16 +121,7 @@ defmodule Elastix.Search do
 
     case query_params do
       [] -> full_path
-      _ -> add_query_params(full_path, query_params)
+      _ -> HTTP.append_query_string(full_path, query_params)
     end
-  end
-
-  @doc false
-  defp add_query_params(path, query_params) do
-    query_string = Enum.map_join query_params, "&", fn(param) ->
-      "#{elem(param, 0)}=#{elem(param, 1)}"
-    end
-
-    "#{path}?#{query_string}"
   end
 end

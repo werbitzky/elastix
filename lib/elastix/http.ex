@@ -52,6 +52,17 @@ defmodule Elastix.HTTP do
     end
   end
 
+  @doc """
+  Encodes an enumerable (`params`) into a query string and appends it to `root`.
+
+  ## Examples
+
+      iex> Elastix.HTTP.append_query_string("/path", %{a: 1, b: 2})
+      "/path?a=1&b=2"
+  """
+  @spec append_query_string(String.t(), term()) :: String.t()
+  def append_query_string(root, params), do: "#{root}?#{URI.encode_query(params)}"
+
   defp default_httpoison_options do
     Elastix.config(:httpoison_options, [])
   end

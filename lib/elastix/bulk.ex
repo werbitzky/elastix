@@ -72,20 +72,11 @@ defmodule Elastix.Bulk do
 
     case query_params do
       [] -> path
-      _ -> add_query_params(path, query_params)
+      _ -> HTTP.append_query_string(path, query_params)
     end
   end
 
-  defp _make_base_path(nil, nil), do: "/_bulk"
-  defp _make_base_path(index_name, nil), do: "/#{index_name}/_bulk"
-  defp _make_base_path(index_name, type_name), do: "/#{index_name}/#{type_name}/_bulk"
-
-  @doc false
-  defp add_query_params(path, query_params) do
-    query_string = Enum.map_join query_params, "&", fn(param) ->
-      "#{elem(param, 0)}=#{elem(param, 1)}"
-    end
-
-    "#{path}?#{query_string}"
-  end
+  defp make_base_path(nil, nil), do: "/_bulk"
+  defp make_base_path(index_name, nil), do: "/#{index_name}/_bulk"
+  defp make_base_path(index_name, type_name), do: "/#{index_name}/#{type_name}/_bulk"
 end
