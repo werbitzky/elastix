@@ -5,11 +5,13 @@ defmodule Elastix.HTTPTest do
   @test_url Elastix.config(:test_url)
 
   test "prepare_url/2 should concat url with path" do
-    assert HTTP.prepare_url("http://127.0.0.1:9200/", "/some_path") == "http://127.0.0.1:9200/some_path"
+    assert HTTP.prepare_url("http://127.0.0.1:9200/", "/some_path") ==
+             "http://127.0.0.1:9200/some_path"
   end
 
   test "prepare_url/2 should concat url with a list of path parts" do
-    assert HTTP.prepare_url("http://127.0.0.1:9200/", ["/some/", "/path/"]) == "http://127.0.0.1:9200/some/path"
+    assert HTTP.prepare_url("http://127.0.0.1:9200/", ["/some/", "/path/"]) ==
+             "http://127.0.0.1:9200/some/path"
   end
 
   test "get should respond with 200" do
@@ -44,15 +46,23 @@ defmodule Elastix.HTTPTest do
 
   test "process_response_body parsed the body into an atom key map if configured" do
     body = "{\"some\":\"json\"}"
-    Application.put_env(:elastix, :poison_options, [keys: :atoms])
+    Application.put_env(:elastix, :poison_options, keys: :atoms)
     assert HTTP.process_response_body(body) == %{some: "json"}
     Application.delete_env(:elastix, :poison_options)
   end
 
   test "adding custom headers" do
-    Application.put_env(:elastix, :custom_headers, {__MODULE__, :add_custom_headers, [:foo]})
+    Application.put_env(
+      :elastix,
+      :custom_headers,
+      {__MODULE__, :add_custom_headers, [:foo]}
+    )
+
     Application.put_env(:elastix, :test_request_mfa, {__MODULE__, :return_headers, []})
-    fake_resp = HTTP.request("GET", "#{@test_url}/_cluster/health", "", [{"yolo", "true"}])
+
+    fake_resp =
+      HTTP.request("GET", "#{@test_url}/_cluster/health", "", [{"yolo", "true"}])
+
     Application.delete_env(:elastix, :test_request_mfa)
     Application.delete_env(:elastix, :custom_headers)
     assert {"yolo", "true"} in fake_resp
@@ -66,7 +76,7 @@ defmodule Elastix.HTTPTest do
   end
 
   # Skip actual http request so we can test what we sent to poison.
-  def return_headers(_,_,_,_,headers,_,_,_,_) do
+  def return_headers(_, _, _, _, headers, _, _, _, _) do
     headers
   end
 end

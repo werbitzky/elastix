@@ -49,7 +49,19 @@ defmodule Elastix.IndexTest do
   end
 
   test "refresh of existing index should respond with 200" do
-    Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
     assert {:ok, %{status_code: 200}} = Index.refresh(@test_url, @test_index)
+  end
+
+  test "open of existing index should respond with 200" do
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 200}} = Index.refresh(@test_url, @test_index)
+    assert {:ok, %{status_code: 200}} = Index.open(@test_url, @test_index)
+  end
+
+  test "close of existing index should respond with 200" do
+    assert {:ok, %{status_code: 200}} = Index.create(@test_url, @test_index, %{})
+    assert {:ok, %{status_code: 200}} = Index.refresh(@test_url, @test_index)
+    assert {:ok, %{status_code: 200}} = Index.close(@test_url, @test_index)
   end
 end
