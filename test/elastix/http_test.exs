@@ -7,6 +7,15 @@ defmodule Elastix.HTTPTest do
   test "prepare_url/2 should concat url with path" do
     assert HTTP.prepare_url("http://127.0.0.1:9200/", "/some_path") ==
              "http://127.0.0.1:9200/some_path"
+
+    assert HTTP.prepare_url("http://127.0.0.1:9200/base_path", "/some_path") ==
+             "http://127.0.0.1:9200/base_path/some_path"
+
+    assert HTTP.prepare_url("http://127.0.0.1:9200/base_path", "some_path") ==
+             "http://127.0.0.1:9200/base_path/some_path"
+
+    assert HTTP.prepare_url("http://127.0.0.1:9200/base_path/", "/some_path") ==
+             "http://127.0.0.1:9200/base_path/some_path"
   end
 
   test "prepare_url/2 should concat url with a list of path parts" do
