@@ -32,16 +32,21 @@ defmodule Elastix.HTTP do
     options = Keyword.merge(default_httpoison_options(), options)
     {m, f, _a} = Elastix.config(:test_request_mfa) || {HTTPoison.Base, :request, []}
 
+    request = %HTTPoison.Request{
+      method: method,
+      url: full_url,
+      headers: process_request_headers(full_headers),
+      body: process_request_body(body),
+      options: options
+    }
+
     apply(m, f, [
       __MODULE__,
-      method,
-      full_url,
-      body,
-      full_headers,
-      options,
-      &process_status_code/1,
-      &process_headers/1,
-      &process_response_body/1
+      request,
+      &process_response_status_code/1,
+      &process_response_headers/1,
+      &process_response_body/1,
+      &process_response/1
     ])
   end
 
