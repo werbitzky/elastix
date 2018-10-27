@@ -76,7 +76,7 @@ defmodule Elastix.HTTPTest do
   end
 
   # Skip actual http request so we can test what we sent to poison.
-  def return_headers(_, _, _, _, headers, _, _, _, _) do
+  def return_headers(_, %HTTPoison.Request{headers: headers}, _, _, _, _) do
     headers
   end
 end
