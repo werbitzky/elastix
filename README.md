@@ -64,6 +64,7 @@ You can also specify the following options:
 
 * `index` the index of the request
 * `type` the document type of the request. *(you can't specify `type` without specifying `index`)*
+* `httpoison_options` configuration directly passed to httpoison methods. Same options that can be passed on config file
 
 ```elixir
 lines = [
@@ -73,7 +74,7 @@ lines = [
   %{field: "value2"}
 ]
 
-Elastix.Bulk.post(elastic_url, lines, index: "my_index", type: "my_type")
+Elastix.Bulk.post(elastic_url, lines, index: "my_index", type: "my_type", httpoison_options: [timeout: 180_000])
 
 # You can also send raw data:
 data = Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end)
