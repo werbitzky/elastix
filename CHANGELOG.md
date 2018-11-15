@@ -3,11 +3,6 @@
 ### Improvements
 
  - Add support for custom httpoison options on bulk calls
-
-## 0.6.1
-
-### Improvements
-
  - Support HTTPoison 1.4
 
 ## 0.6.0
