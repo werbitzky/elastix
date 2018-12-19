@@ -1,3 +1,9 @@
+## 0.7.1
+
+### Package improvements
+
+ - Improve package description
+
 ## 0.7.0
 
 ### Improvements
