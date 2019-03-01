@@ -61,7 +61,8 @@ defmodule Elastix.Index do
       iex> Elastix.Index.exists?("http://localhost:9200", "twitter")
       {:ok, true}
   """
-  @spec exists?(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
+  @spec exists?(elastic_url :: String.t(), name :: String.t()) ::
+          {:ok, boolean()} | {:error, HTTPoison.Error.t()}
   def exists?(elastic_url, name) do
     case prepare_url(elastic_url, name) |> HTTP.head() do
       {:ok, response} ->
