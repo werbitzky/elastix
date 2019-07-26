@@ -120,19 +120,4 @@ defmodule Elastix.Index do
     prepare_url(elastic_url, [name, "_close"])
     |> HTTP.post("")
   end
-
-  @doc """
-  [Aliases](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html)
-  on indexes.
-
-  ## Examples
-      iex> actions = [%{ add: %{ index: "test1", alias: "alias1" }}]
-      iex> Elastix.Index.aliases("http://localhost:9200", actions)
-      {:ok, %HTTPoison.Response{...}}
-  """
-  @spec aliases(elastic_url :: String.t(), actions :: list) :: HTTP.resp()
-  def aliases(elastic_url, actions) do
-    prepare_url(elastic_url, ["_aliases"])
-    |> HTTP.post(JSON.encode!(%{actions: actions}))
-  end
 end
