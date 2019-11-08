@@ -15,7 +15,15 @@ defmodule Elastix.Mixfile do
       aliases: aliases(),
       deps: deps(),
       name: "Elastix",
-      docs: docs()
+      docs: docs(),
+      dialyzer: [
+        # plt_add_deps: :project,
+        # plt_add_apps: [:ssl, :mnesia, :compiler, :xmerl, :inets],
+        # plt_add_deps: true,
+        # flags: ["-Werror_handling", "-Wrace_conditions"],
+        # flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs],
+        # ignore_warnings: "dialyzer.ignore-warnings"
+      ],
     ]
   end
 
@@ -39,6 +47,7 @@ defmodule Elastix.Mixfile do
     [
       {:ex_doc, "~> 0.14", only: :dev},
       {:credo, "~> 0.6", only: [:dev, :test]},
+      {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
       {:poison, "~> 4.0", optional: true},
       {:httpoison, "~> 1.4"},

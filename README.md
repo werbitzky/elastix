@@ -1,15 +1,20 @@
 # Elastix [![Hex Version](https://img.shields.io/hexpm/v/elastix.svg)](https://hex.pm/packages/elastix) [![Hex Downloads](https://img.shields.io/hexpm/dt/elastix.svg)](https://hex.pm/packages/elastix) [![Build Status](https://travis-ci.org/werbitzky/elastix.svg)](https://travis-ci.org/werbitzky/elastix) [![WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/wtfpl)
 
-A DSL-free Elasticsearch client for Elixir.
+An Elasticsearch client for Elixir.
+
+This library has convenience functions for working with the Elasticsearch
+API. It does not use a DSL, it expects you to interact with the Elasticsearch
+using native JSON data structures, or the equivalent Elixir data structures which
+it will encode for you.
+
+It supports the new Elasticsearch 7.x as well as older versions.
+7.x has [removed mapping types on indexes](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html),
+which resulted in incompatible changes to a number of APIs.
 
 ## Documentation
 
 * [Documentation on hexdocs.pm](https://hexdocs.pm/elastix/)
 * [Latest Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
-
-Even though the [documentation](https://hexdocs.pm/elastix/) is pretty scarce right now, we're working on improving it. If you want to help with that you're definitely welcome 🤗
-
-This README contains most of the information you should need to get started, if you can't find what you're looking for, either look at the tests or file an issue!
 
 ## Installation
 
@@ -25,7 +30,7 @@ Then run `mix deps.get` to fetch the new dependency.
 
 ## Examples
 
-### Creating an Elasticsearch index
+### Creating an index
 
 ```elixir
 Elastix.Index.create("http://localhost:9200", "twitter", %{})
@@ -37,9 +42,9 @@ Elastix.Index.create("http://localhost:9200", "twitter", %{})
 elastic_url = "http://localhost:9200"
 
 data = %{
-    user: "kimchy",
-    post_date: "2009-11-15T14:12:12",
-    message: "trying out Elastix"
+  user: "kimchy",
+  post_date: "2009-11-15T14:12:12",
+  message: "trying out Elastix"
 }
 
 mapping = %{
@@ -58,7 +63,9 @@ Elastix.Document.delete(elastic_url, "twitter", "tweet", "42")
 
 ### Bulk requests
 
-Bulk requests take as parameter a list of the lines you want to send to the [`_bulk`](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) endpoint.
+Bulk requests take as parameter a list of the lines you want to send to the
+[`_bulk`](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
+endpoint.
 
 You can also specify the following options:
 
@@ -100,7 +107,9 @@ config :elastix,
   httpoison_options: [hackney: [pool: :elastix_pool]]
 ```
 
-Note that you can configure Elastix to use any JSON library, see the ["Custom JSON codec" page](https://hexdocs.pm/elastix/custom-json-codec.html) for more info.
+Note that you can configure Elastix to use any JSON library, see the
+["Custom JSON codec" page](https://hexdocs.pm/elastix/custom-json-codec.html) for more
+info.
 
 ### Custom headers
 
@@ -109,7 +118,10 @@ config :elastix,
   custom_headers: {MyModule, :add_aws_signature, ["us-east"]}
 ```
 
-`custom_headers` must be a tuple of the type `{Module, :function, [args]}`, where `:function` is a function that should accept the request (a map of this type: `%{method: String.t, headers: [], url: String.t, body: String.t}`) as its first parameter and return a list of the headers you want to send:
+`custom_headers` must be a tuple of the type `{Module, :function, [args]}`,
+where `:function` is a function that should accept the request (a map of this
+type: `%{method: String.t, headers: [], url: String.t, body: String.t}`) as its
+first parameter and return a list of the headers you want to send:
 
 ```elixir
 defmodule MyModule do
@@ -125,7 +137,8 @@ end
 
 ## Running tests
 
-You need Elasticsearch running locally on port 9200. A quick way of doing so is via Docker:
+You need Elasticsearch running locally on port 9200.
+A quick way of doing so is via Docker:
 
 ```
 $ docker run -p 9200:9200 -it --rm elasticsearch:5.1.2
@@ -142,6 +155,8 @@ $ mix test
 
 ## License
 
-Copyright © 2017 El Werbitzky werbitzky@gmail.com
+Copyright © 2017-2019 El Werbitzky werbitzky@gmail.com
 
-This work is free. You can redistribute it and/or modify it under the terms of the Do What The Fuck You Want To Public License, Version 2, as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
+This work is free. You can redistribute it and/or modify it under the terms of
+the Do What The Fuck You Want To Public License, Version 2, as published by Sam
+Hocevar. See http://www.wtfpl.net/ for more details.
