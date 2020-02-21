@@ -7,7 +7,7 @@ defmodule Elastix.Mixfile do
     [
       app: :elastix,
       version: @version,
-      elixir: "~> 1.0",
+      elixir: "~> 1.6",
       description: "A DSL-free Elastic / Elasticsearch client for Elixir.",
       package: package(),
       build_embedded: Mix.env() == :prod,
