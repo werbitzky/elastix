@@ -1,3 +1,9 @@
+## 0.8.0
+
+### Breaking changes
+
+ - Drop support for Elixir <1.6
+
 ## 0.7.1
 
 ### Package improvements
