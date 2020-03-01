@@ -1,38 +1,40 @@
 defmodule Elastix.Index do
   @moduledoc """
-  The indices APIs are used to manage individual indices, index settings, aliases, mappings, and index templates.
+  The indices APIs are used to manage individual indices, index settings,
+  aliases, mappings, and index templates.
 
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
   """
-  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.{HTTP, JSON}
 
   @doc """
-  Creates a new index.
+  Create a new index.
 
   ## Examples
 
       iex> Elastix.Index.create("http://localhost:9200", "twitter", %{})
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec create(elastic_url :: String.t(), name :: String.t(), data :: map) :: HTTP.resp()
-  def create(elastic_url, name, data) do
-    prepare_url(elastic_url, name)
-    |> HTTP.put(JSON.encode!(data))
+  @spec create(binary, binary, map) :: HTTP.resp
+  def create(elastic_url, index, data) do
+    url = HTTP.make_url(elastic_url, index)
+    HTTP.put(url, JSON.encode!(data))
   end
 
   @doc """
-  Deletes an existing index.
+  Delete an existing index.
 
   ## Examples
 
       iex> Elastix.Index.delete("http://localhost:9200", "twitter")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec delete(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
-  def delete(elastic_url, name) do
-    prepare_url(elastic_url, name)
-    |> HTTP.delete()
+  @spec delete(binary, binary) :: HTTP.resp
+  def delete(elastic_url, index) do
+    url = HTTP.make_url(elastic_url, index)
+    HTTP.delete(url)
   end
 
   @doc """
@@ -42,82 +44,89 @@ defmodule Elastix.Index do
 
       iex> Elastix.Index.get("http://localhost:9200", "twitter")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec get(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
-  def get(elastic_url, name) do
-    prepare_url(elastic_url, name)
-    |> HTTP.get()
+  @spec get(binary, binary) :: HTTP.resp
+  def get(elastic_url, index) do
+    url = HTTP.make_url(elastic_url, index)
+    HTTP.get(url)
   end
 
   @doc """
-  Returns `true` if the specified index exists, `false` otherwise.
+  Check if index exists.
+
+  Returns `{:ok, true}` if the index exists.
 
   ## Examples
 
       iex> Elastix.Index.exists?("http://localhost:9200", "twitter")
       {:ok, false}
+
       iex> Elastix.Index.create("http://localhost:9200", "twitter", %{})
       {:ok, %HTTPoison.Response{...}}
+
       iex> Elastix.Index.exists?("http://localhost:9200", "twitter")
       {:ok, true}
-  """
-  @spec exists?(elastic_url :: String.t(), name :: String.t()) ::
-          {:ok, boolean()} | {:error, HTTPoison.Error.t()}
-  def exists?(elastic_url, name) do
-    case prepare_url(elastic_url, name) |> HTTP.head() do
-      {:ok, response} ->
-        case response.status_code do
-          200 -> {:ok, true}
-          404 -> {:ok, false}
-        end
 
-      err ->
-        err
+  """
+  @spec exists?(binary, binary) :: {:ok, boolean} | {:error, HTTPoison.Error.t}
+  def exists?(elastic_url, index) do
+    url = HTTP.make_url(elastic_url, index)
+    case HTTP.head(url) do
+      {:ok, %{status_code: 200}} -> {:ok, true}
+      {:ok, %{status_code: 404}} -> {:ok, false}
+      err -> err
     end
   end
 
   @doc """
-  Forces the [refresh](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html)
-  of the specified index.
+  Force refresh of index.
+
+  [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-refresh.html)
 
   ## Examples
 
       iex> Elastix.Index.refresh("http://localhost:9200", "twitter")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec refresh(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
-  def refresh(elastic_url, name) do
-    prepare_url(elastic_url, [name, "_refresh"])
-    |> HTTP.post("")
+  @spec refresh(binary, binary) :: HTTP.resp
+  def refresh(elastic_url, index) do
+    url = HTTP.make_url(elastic_url, [index, "_refresh"])
+    HTTP.post(url, "")
   end
 
   @doc """
-  [Opens](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
-  the specified index.
+  Open index.
+
+  [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
 
   ## Examples
 
       iex> Elastix.Index.open("http://localhost:9200", "twitter")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec open(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
-  def open(elastic_url, name) do
-    prepare_url(elastic_url, [name, "_open"])
-    |> HTTP.post("")
+  @spec open(binary, binary) :: HTTP.resp
+  def open(elastic_url, index) do
+    url = HTTP.make_url(elastic_url, [index, "_open"])
+    HTTP.post(url, "")
   end
 
   @doc """
-  [Closes](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
-  the specified index.
+  Close index.
+
+  [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-open-close.html)
 
   ## Examples
 
       iex> Elastix.Index.close("http://localhost:9200", "twitter")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec close(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
-  def close(elastic_url, name) do
-    prepare_url(elastic_url, [name, "_close"])
-    |> HTTP.post("")
+  @spec close(binary, binary) :: HTTP.resp
+  def close(elastic_url, index) do
+    url = HTTP.make_url(elastic_url, [index, "_close"])
+    HTTP.post(url, "")
   end
 end

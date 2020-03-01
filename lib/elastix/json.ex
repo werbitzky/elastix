@@ -1,4 +1,7 @@
 defmodule Elastix.JSON do
+
+  require Logger
+
   defmodule Codec do
     @moduledoc """
     A behaviour for JSON serialization.
@@ -53,7 +56,7 @@ defmodule Elastix.JSON do
         Elastix.config(:json_options, [])
 
       opts ->
-        IO.warn(
+        Logger.warn(
           "Using :poison_options is deprecated and might not work in future releases; use :json_options instead."
         )
 

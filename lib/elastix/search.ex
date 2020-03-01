@@ -4,125 +4,109 @@ defmodule Elastix.Search do
 
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html)
   """
-  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.{HTTP, JSON}
 
   @doc """
-  Makes a request to the `_search` or the `_msearch` endpoint depending on the type of
-  `data`.
+  Search index based on query.
 
-  When passing a map for data, it'll make a simple search, but you can pass a list of
+  Query can be specified as a single map or as a list of maps.
+
+  If a list, uses the [multi search API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html)
+  to execute several searches from a single API request.
+
+  When passing a map for data, makes a simple search, but you can pass a list of
   header and body params to make a [multi search](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-multi-search.html).
 
   ## Examples
 
-      iex> Elastix.Search.search("http://localhost:9200", "twitter", ["tweet"], %{query: %{term: %{user: "kimchy"}}})
+      iex> query = %{query: %{term: %{user: "kimchy"}}}
+      iex> Elastix.Search.search("http://localhost:9200", "twitter", ["tweet"], query)
       {:ok, %HTTPoison.Response{...}}
+
+      iex> query = %{query: %{term: %{user: "kimchy"}}}
+      iex> Elastix.Search.search("http://localhost:9200", "twitter", [], query)
+      {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec search(
-          elastic_url :: String.t(),
-          index :: String.t(),
-          types :: list,
-          data :: map | list
-        ) :: HTTP.resp()
-  def search(elastic_url, index, types, data) when is_list(data),
-    do: search(elastic_url, index, types, data, [])
-
-  def search(elastic_url, index, types, data),
-    do: search(elastic_url, index, types, data, [])
-
-  @doc """
-  Same as `search/4` but allows to specify query params and options for
-  [`HTTPoison.request/5`](https://hexdocs.pm/httpoison/HTTPoison.html#request/5).
-  """
-  @spec search(
-          elastic_url :: String.t(),
-          index :: String.t(),
-          types :: list,
-          data :: map | list,
-          query_params :: Keyword.t(),
-          options :: Keyword.t()
-        ) :: HTTP.resp()
-  def search(elastic_url, index, types, data, query_params, options \\ [])
-
-  def search(elastic_url, index, types, data, query_params, options)
-      when is_list(data) do
-    data =
-      Enum.reduce(data, [], fn d, acc -> ["\n", JSON.encode!(d) | acc] end)
-      |> Enum.reverse()
-      |> IO.iodata_to_binary()
-
-    prepare_url(elastic_url, make_path(index, types, query_params, "_msearch"))
-    |> HTTP.post(data, [], options)
-  end
-
-  def search(elastic_url, index, types, data, query_params, options) do
-    prepare_url(elastic_url, make_path(index, types, query_params))
-    |> HTTP.post(JSON.encode!(data), [], options)
+  @spec search(binary, binary, list, map | list) :: HTTP.resp
+  def search(elastic_url, index, types, query) do
+    search(elastic_url, index, types, query, [])
   end
 
   @doc """
-  Uses the [Scroll API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html)
-  to allow scrolling through a list of results.
+  Search index based on query, with query params and HTTP options.
+
+  See [`HTTPoison.request/5`](https://hexdocs.pm/httpoison/HTTPoison.html#request/5) for options.
+  """
+  @spec search(binary, binary, list, map | list, Keyword.t, Keyword.t) :: HTTP.resp
+  def search(elastic_url, index, types, query, query_params, httpoison_options \\ [])
+
+  def search(elastic_url, index, types, query, query_params, httpoison_options) when is_list(query) do
+    url = HTTP.make_url(elastic_url, make_path(index, types, "_msearch"), query_params)
+    data = for q <- query, do: [JSON.encode!(q), "\n"]
+    headers = [{"Content-Type", "application/x-ndjson"}]
+    HTTP.post(url, data, headers, httpoison_options)
+  end
+
+  def search(elastic_url, index, types, query, query_params, httpoison_options) when is_map(query) do
+    url = HTTP.make_url(elastic_url, make_path(index, types), query_params)
+    HTTP.post(url, JSON.encode!(query), [], httpoison_options)
+  end
+
+  @doc """
+  Search with scrolling through results.
+
+  See the [Scroll API docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html).
 
   ## Examples
 
-      iex> Elastix.Search.scroll("http://localhost:9200", %{query: %{term: %{user: "kimchy"}}})
+      iex> query = %{query: %{term: %{user: "kimchy"}}}, scroll: "1m")
+      iex> {:ok, response} = Elastix.Search.search("http://localhost:9200", "twitter", [], query, scroll: "1m")
+      iex> scroll_id = response.body["_scroll_id"]
+      iex> params = %{scroll: "1m", scroll_id: scroll_id}
+      iex> Elastix.Search.scroll("http://localhost:9200", params)
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec scroll(elastic_url :: String.t(), data :: map, options :: Keyword.t()) ::
-          HTTP.resp()
-  def scroll(elastic_url, data, options \\ []) do
-    prepare_url(elastic_url, "_search/scroll")
-    |> HTTP.post(JSON.encode!(data), [], options)
+  @spec scroll(binary, map, Keyword.t) :: HTTP.resp
+  def scroll(elastic_url, scroll_params, httpoison_options \\ []) do
+    url = HTTP.make_url(elastic_url, "_search/scroll")
+    HTTP.post(url, JSON.encode!(scroll_params), [], httpoison_options)
   end
 
   @doc """
-  Returns the number of results for a query using the
-  [Count API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html).
+  Returns the number of results for a query using count API.
+
+  See [Count API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-count.html).
 
   ## Examples
 
       iex> Elastix.Search.count("http://localhost:9200", "twitter", ["tweet"], %{query: %{term: %{user: "kimchy"}}})
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec count(elastic_url :: String.t(), index :: String.t(), types :: list, data :: map) ::
-          HTTP.resp()
-  def count(elastic_url, index, types, data),
-    do: count(elastic_url, index, types, data, [])
+  @spec count(binary, binary, list, map) :: HTTP.resp
+  def count(elastic_url, index, types, data) do
+    count(elastic_url, index, types, data, [])
+  end
 
   @doc """
-  Same as `count/4` but allows to specify query params and options for
-  [`HTTPoison.request/5`](https://hexdocs.pm/httpoison/HTTPoison.html#request/5).
+  Returns the number of results for a query using count API, supporting query params and HTTP options.
+
+  See [`HTTPoison.request/5`](https://hexdocs.pm/httpoison/HTTPoison.html#request/5).
   """
-  @spec count(
-          elastic_url :: String.t(),
-          index :: String.t(),
-          types :: list,
-          data :: map,
-          query_params :: Keyword.t(),
-          options :: Keyword.t()
-        ) :: HTTP.resp()
+  @spec count(binary, binary, list, map, Keyword.t, Keyword.t) :: HTTP.resp
   def count(elastic_url, index, types, data, query_params, options \\ []) do
-    (elastic_url <> make_path(index, types, query_params, "_count"))
-    |> HTTP.post(JSON.encode!(data), [], options)
+    url = HTTP.make_url(elastic_url, make_path(index, types, "_count"), query_params)
+    HTTP.post(url, JSON.encode!(data), [], options)
   end
 
   @doc false
-  def make_path(index, types, query_params, api_type \\ "_search") do
-    path_root = "/#{index}"
-
-    path =
-      case types do
-        [] -> path_root
-        _ -> path_root <> "/" <> Enum.join(types, ",")
-      end
-
-    full_path = "#{path}/#{api_type}"
-
-    case query_params do
-      [] -> full_path
-      _ -> HTTP.append_query_string(full_path, query_params)
-    end
+  @spec make_path(binary, [binary], binary) :: binary
+  def make_path(index, types, api_type \\ "_search")
+  def make_path(index, [], api_type), do: "/#{index}/#{api_type}"
+  def make_path(index, types, api_type) do
+    types = Enum.join(types, ",")
+    "/#{index}/#{types}/#{api_type}"
   end
 end

@@ -19,4 +19,16 @@ defmodule Elastix do
 
   @doc false
   def config(key, default \\ nil), do: Application.get_env(:elastix, key, default)
+
+
+  @doc "Convert Elasticsearch version string into tuple."
+  def version_to_tuple(version) when is_binary(version) do
+    version
+    |> String.split([".", "-"])
+    |> Enum.map(&String.to_integer/1)
+    |> version_to_tuple()
+  end
+  def version_to_tuple([first, second]), do: {first, second, 0}
+  def version_to_tuple([first, second, third | _rest]), do: {first, second, third}
+
 end

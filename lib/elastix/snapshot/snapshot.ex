@@ -5,91 +5,172 @@ defmodule Elastix.Snapshot.Snapshot do
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html)
   """
 
-  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.{HTTP, JSON}
 
   @doc """
-  Creates a snapshot.
+  Create snapshot.
+
+  [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html#snapshots-take-snapshot)
+
+  ## Examples
+
+      iex> elastic_url = "http://localhost:9200"
+      iex> repository = "elastix_test_repository_1"
+      iex> snapshot = "elastix_test_snapshot_2"
+      iex> config = %{indices: "elastix_test_index_1,elastix_test_index_2"
+      iex> Elastix.Snapshot.create(elastic_url, repository, snapshot, wait_for_completion: true)
+      {:ok,
+        %HTTPoison.Response{
+          body: %{
+            "snapshot" => %{
+              "duration_in_millis" => 74,
+              "end_time" => "2019-11-17T00:29:44.931Z",
+              "end_time_in_millis" => 1573950584931,
+              "failures" => [],
+              "include_global_state" => true,
+              "indices" => ["elastix_test_index_2", "elastix_test_index_1"],
+              "shards" => %{"failed" => 0, "successful" => 10, "total" => 10},
+              "snapshot" => "elastix_test_snapshot_2",
+              "start_time" => "2019-11-17T00:29:44.857Z",
+              "start_time_in_millis" => 1573950584857,
+              "state" => "SUCCESS",
+              "uuid" => "kBL1rleOQS-qfXqvXatNng",
+              "version" => "6.8.4",
+              "version_id" => 6080499
+            }
+          },
+          headers: [{"content-type", "application/json; charset=UTF-8"}, {"content-length", "463"}],
+          request: %HTTPoison.Request{
+            body: "{\"indices\":\"elastix_test_index_1,elastix_test_index_2\"}",
+            headers: [{"Content-Type", "application/json; charset=UTF-8"}],
+            method: :put,
+            options: [],
+            params: %{},
+            url: "http://127.0.0.1:9200/_snapshot/elastix_test_repository/elastix_test_snapshot_2?wait_for_completion=true"
+          },
+          request_url: "http://127.0.0.1:9200/_snapshot/elastix_test_repository/elastix_test_snapshot_2?wait_for_completion=true",
+          status_code: 200
+        }
+      }
+
   """
-  @spec create(String.t(), String.t(), String.t(), Map.t(), [tuple()]) ::
-          {:ok, %HTTPoison.Response{}}
-  def create(elastic_url, repo_name, snapshot_name, data \\ %{}, query_params \\ []) do
-    elastic_url
-    |> prepare_url(make_path(repo_name, snapshot_name, query_params))
-    |> HTTP.put(JSON.encode!(data))
+  @spec create(binary, binary, binary, map, Keyword.t) :: HTTP.resp
+  def create(elastic_url, repo, snapshot, config \\ %{}, query_params \\ []) do
+    url = HTTP.make_url(elastic_url, make_path(repo, snapshot), query_params)
+    HTTP.put(url, JSON.encode!(config))
   end
 
   @doc """
-  Restores a previously created snapshot.
+  Restore previously created snapshot.
   """
-  @spec restore(String.t(), String.t(), String.t(), Map.t()) ::
-          {:ok, %HTTPoison.Response{}}
-  def restore(elastic_url, repo_name, snapshot_name, data \\ %{}) do
-    elastic_url
-    |> prepare_url([make_path(repo_name, snapshot_name), "_restore"])
-    |> HTTP.post(JSON.encode!(data))
+  @spec restore(binary, binary, binary, map) :: HTTP.resp
+  def restore(elastic_url, repo, snapshot, data \\ %{}) do
+    url = HTTP.make_url(elastic_url, [make_path(repo, snapshot), "_restore"])
+    HTTP.post(url, JSON.encode!(data))
   end
 
   @doc """
-  If repo_name and snapshot_name is specified, will retrieve the status of that
-  snapsot. If repo_name is specified, will retrieve the status of all snapshots
+  Get status of snapshots.
+
+  If repo and snapshot is specified, will retrieve the status of that
+  snapshot. If repo is specified, will retrieve the status of all snapshots
   in that repository. Otherwise, will retrieve the status of all snapshots.
+
+  ## Examples
+
+      iex> elastic_url = "http://localhost:9200"
+      iex> repository = "elastix_test_repository_1"
+      iex> snapshot = "elastix_test_snapshot_2"
+      iex> Elastix.Snapshot.status(elastic_url, repository, snapshot)
+
   """
-  @spec status(String.t(), String.t(), String.t()) :: {:ok, %HTTPoison.Response{}}
-  def status(elastic_url, repo_name \\ "", snapshot_name \\ "") do
-    elastic_url
-    |> prepare_url([make_path(repo_name, snapshot_name), "_status"])
-    |> HTTP.get()
+  @spec status(binary, binary, binary) :: HTTP.resp
+  def status(elastic_url, repo \\ "", snapshot \\ "") do
+    url = HTTP.make_url(elastic_url, [make_path(repo, snapshot), "_status"])
+    HTTP.get(url)
   end
 
   @doc """
+  Get information about snapshot.
+
   If repo_name and snapshot_name is specified, will retrieve information about
   that snapshot. If repo_name is specified, will retrieve information about
   all snapshots in that repository. Oterwise, will retrieve information about
   all snapshots.
+
+  ## Examples
+
+      iex> elastic_url = "http://localhost:9200"
+      iex> repository = "elastix_test_repository_1"
+      iex> snapshot = "elastix_test_snapshot_2"
+      iex> Elastix.Snapshot.get(elastic_url, repository, snapshot)
+      {:ok,
+        %HTTPoison.Response{
+          body: %{
+            "snapshots" => [
+              %{
+                "duration_in_millis" => 45,
+                "end_time" => "2019-11-17T00:37:03.858Z",
+                "end_time_in_millis" => 1573951023858,
+                "failures" => [],
+                "include_global_state" => true,
+                "indices" => ["elastix_test_index_2", "elastix_test_index_1"],
+                "shards" => %{"failed" => 0, "successful" => 10, "total" => 10},
+                "snapshot" => "elastix_test_snapshot_2",
+                "start_time" => "2019-11-17T00:37:03.813Z",
+                "start_time_in_millis" => 1573951023813,
+                "state" => "SUCCESS",
+                "uuid" => "_l_J5caMQkWVx16kLhwoaw",
+                "version" => "6.8.4",
+                "version_id" => 6080499
+              }
+            ]
+          },
+          headers: [{"content-type", "application/json; charset=UTF-8"}, {"content-length", "466"}],
+          request: %HTTPoison.Request{
+            body: "",
+            headers: [{"Content-Type", "application/json; charset=UTF-8"}],
+            method: :get,
+            options: [],
+            params: %{},
+            url: "http://127.0.0.1:9200/_snapshot/elastix_test_repository/elastix_test_snapshot_2"
+          },
+          request_url: "http://127.0.0.1:9200/_snapshot/elastix_test_repository/elastix_test_snapshot_2",
+          status_code: 200
+        }
+      }
+
+      iex> elastic_url = "http://localhost:9200"
+      iex> repository = "elastix_test_repository_1"
+      iex> Elastix.Snapshot.get(elastic_url, repository)
+
+      iex> elastic_url = "http://localhost:9200"
+      iex> repository = "elastix_test_repository_1"
+      iex> Elastix.Snapshot.get(elastic_url)
+
   """
-  @spec get(String.t(), String.t(), String.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec get(binary, binary, binary) :: HTTP.resp
   def get(elastic_url, repo_name \\ "", snapshot_name \\ "_all") do
-    elastic_url
-    |> prepare_url(make_path(repo_name, snapshot_name))
-    |> HTTP.get()
+    url = HTTP.make_url(elastic_url, make_path(repo_name, snapshot_name))
+    HTTP.get(url)
   end
 
   @doc """
-  Deletes a snapshot from a repository. This can also be used to stop currently
-  running snapshot and restore operations.
+  Delete snapshot from repository.
+
+  This can also be used to stop currently running snapshot and restore operations.
   """
-  @spec delete(String.t(), String.t(), String.t()) :: {:ok, %HTTPoison.Response{}}
-  def delete(elastic_url, repo_name, snapshot_name) do
-    elastic_url
-    |> prepare_url(make_path(repo_name, snapshot_name))
-    |> HTTP.delete()
+  @spec delete(binary, binary, binary) :: HTTP.resp
+  def delete(elastic_url, repo, snapshot) do
+    url = HTTP.make_url(elastic_url, make_path(repo, snapshot))
+    HTTP.delete(url)
   end
 
-  @doc false
-  @spec make_path(String.t(), [tuple()]) :: String.t()
-  def make_path(repo_name, snapshot_name, query_params \\ []) do
-    path = _make_base_path(repo_name, snapshot_name)
+ @doc false
+  @spec make_path(binary | nil, binary | nil) :: binary
+  def make_path(repo, snapshot)
+  def make_path(nil, nil), do: "/_snapshot"
+  def make_path(repo, nil), do: "/_snapshot/#{repo}"
+  def make_path(repo, snapshot), do: "/_snapshot/#{repo}/#{snapshot}"
 
-    case query_params do
-      [] -> path
-      _ -> _add_query_params(path, query_params)
-    end
-  end
-
-  defp _make_base_path(nil, nil), do: "/_snapshot"
-  defp _make_base_path(repo_name, nil), do: "/_snapshot/#{repo_name}"
-
-  defp _make_base_path(repo_name, snapshot_name),
-    do: "/_snapshot/#{repo_name}/#{snapshot_name}"
-
-  defp _add_query_params(path, query_params) do
-    query_string =
-      query_params
-      |> Enum.map_join("&", fn param ->
-        "#{elem(param, 0)}=#{elem(param, 1)}"
-      end)
-
-    "#{path}?#{query_string}"
-  end
 end
