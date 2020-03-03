@@ -58,13 +58,19 @@ defmodule Elastix.Snapshot.Snapshot do
   @doc """
   Deletes a snapshot from a repository. This can also be used to stop currently
   running snapshot and restore operations. Snapshot deletes can be slow, so
-  you can pass in HTTPoison/Hackney options like `:recv_timeout` to wait longer.
+  you can pass in HTTPoison/Hackney options in an `httpoison_options` keyword
+  argument like `:recv_timeout` to wait longer.
+
+  ## Examples
+
+  iex> Elastix.Snapshot.Snapshot.delete("http://localhost:9200", "backups", "snapshot_123", httpoison_options: [recv_timeout: 30_000])
+  {:ok, %HTTPoison.Response{...}}
   """
   @spec delete(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, %HTTPoison.Response{}}
   def delete(elastic_url, repo_name, snapshot_name, options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name))
-    |> HTTP.delete([], options)
+    |> HTTP.delete([], Keyword.get(options, :httpoison_options, []))
   end
 
   @doc false
