@@ -3,6 +3,10 @@
 ### Breaking changes
 
  - Drop support for Elixir <1.6
+ 
+### Improvements
+
+ - Add support for custom httpoison options in snapshot delete function
 
 ## 0.7.1
 
