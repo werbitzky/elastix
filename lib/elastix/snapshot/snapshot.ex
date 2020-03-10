@@ -11,12 +11,12 @@ defmodule Elastix.Snapshot.Snapshot do
   @doc """
   Creates a snapshot.
   """
-  @spec create(String.t(), String.t(), String.t(), Map.t(), [tuple()]) ::
+  @spec create(String.t(), String.t(), String.t(), Map.t(), [tuple()], Keyword.t()) ::
           {:ok, %HTTPoison.Response{}}
-  def create(elastic_url, repo_name, snapshot_name, data \\ %{}, query_params \\ []) do
+  def create(elastic_url, repo_name, snapshot_name, data \\ %{}, query_params \\ [], options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name, query_params))
-    |> HTTP.put(JSON.encode!(data))
+    |> HTTP.put(JSON.encode!(data), [], Keyword.get(options, :httpoison_options, []))
   end
 
   @doc """
