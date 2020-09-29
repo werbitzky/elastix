@@ -18,10 +18,13 @@ defmodule Elastix.Search do
 
       iex> Elastix.Search.search("http://localhost:9200", "twitter", ["tweet"], %{query: %{term: %{user: "kimchy"}}})
       {:ok, %HTTPoison.Response{...}}
+
+      iex> Elastix.Search.search("http://localhost:9200", ["twitter", "other-index"], ["tweet"], %{query: %{term: %{user: "kimchy"}}})
+      {:ok, %HTTPoison.Response{...}}
   """
   @spec search(
           elastic_url :: String.t(),
-          index :: String.t(),
+          index :: String.t() | list,
           types :: list,
           data :: map | list
         ) :: HTTP.resp()
@@ -37,13 +40,18 @@ defmodule Elastix.Search do
   """
   @spec search(
           elastic_url :: String.t(),
-          index :: String.t(),
+          index :: String.t() | list,
           types :: list,
           data :: map | list,
           query_params :: Keyword.t(),
           options :: Keyword.t()
         ) :: HTTP.resp()
   def search(elastic_url, index, types, data, query_params, options \\ [])
+
+  def search(elastic_url, index, types, data, query_params, options)
+      when is_list(index) do
+    search(elastic_url, Enum.join(index, ","), types, data, query_params, options)
+  end
 
   def search(elastic_url, index, types, data, query_params, options)
       when is_list(data) do
