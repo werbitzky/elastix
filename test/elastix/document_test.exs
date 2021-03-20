@@ -125,6 +125,65 @@ defmodule Elastix.DocumentTest do
     assert body["_source"]["message"] == "trying out Elasticsearch"
   end
 
+  test "update by query can update a list of docs by matching query" do
+    Document.index(@test_url, @test_index, "message", 1, @data, refresh: true)
+    Document.index(@test_url, @test_index, "message", 2, @data, refresh: true)
+
+    new_post_date = "2020-06-03T14:12:12"
+
+    script = %{
+      inline: "ctx._source.post_date = '#{new_post_date}'",
+      lang: "painless"
+    }
+
+    query = %{"term" => %{"user" => "örelbörel"}}
+
+    {:ok, response} =
+      Document.update_by_query(@test_url, @test_index, query, script, refresh: true)
+
+    assert response.status_code == 200
+
+    {:ok, %{body: body, status_code: status_code}} =
+      Document.get(@test_url, @test_index, "message", 1)
+
+    assert status_code == 200
+    assert body["_source"]["user"] == "örelbörel"
+    assert body["_source"]["post_date"] == new_post_date
+    assert body["_source"]["message"] == "trying out Elasticsearch"
+
+    {:ok, %{body: body, status_code: status_code}} =
+      Document.get(@test_url, @test_index, "message", 2)
+
+    assert status_code == 200
+    assert body["_source"]["user"] == "örelbörel"
+    assert body["_source"]["post_date"] == new_post_date
+    assert body["_source"]["message"] == "trying out Elasticsearch"
+  end
+
+  test "update by query doesnt update when no matches are found" do
+    Document.index(@test_url, @test_index, "message", 1, @data, refresh: true)
+
+    script = %{
+      inline: "ctx._source.message = 'updated message'",
+      lang: "painless"
+    }
+
+    query = %{"term" => %{"user" => "other user"}}
+
+    {:ok, response} =
+      Document.update_by_query(@test_url, @test_index, query, script, refresh: true)
+
+    assert response.status_code == 200
+
+    {:ok, %{body: body, status_code: status_code}} =
+      Document.get(@test_url, @test_index, "message", 1)
+
+    assert status_code == 200
+    assert body["_source"]["user"] == "örelbörel"
+    assert body["_source"]["post_date"] == "2009-11-15T14:12:12"
+    assert body["_source"]["message"] == "trying out Elasticsearch"
+  end
+
   test "can get multiple documents (multi get)" do
     Document.index(@test_url, @test_index, "message", 1, @data)
     Document.index(@test_url, @test_index, "message", 2, @data)
