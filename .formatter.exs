@@ -1,11 +1,5 @@
+# Used by "mix format"
 [
-  inputs: [
-    "lib/**/*.{ex,exs}",
-    "test/**/*.{ex,exs}",
-    "config/*.exs",
-    "mix.exs",
-    ".credo.exs",
-    ".formatter.exs"
-  ],
+  inputs: ["{mix,.credo,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
   line_length: 90
 ]

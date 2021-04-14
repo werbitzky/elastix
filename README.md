@@ -1,4 +1,11 @@
-# Elastix [![Hex Version](https://img.shields.io/hexpm/v/elastix.svg)](https://hex.pm/packages/elastix) [![Hex Downloads](https://img.shields.io/hexpm/dt/elastix.svg)](https://hex.pm/packages/elastix) [![Build Status](https://travis-ci.org/werbitzky/elastix.svg)](https://travis-ci.org/werbitzky/elastix) [![WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/wtfpl)
+# Elastix
+
+[![Build Status](https://travis-ci.org/werbitzky/elastix.svg)](https://travis-ci.org/werbitzky/elastix)
+[![Hex Version](https://img.shields.io/hexpm/v/elastix.svg)](https://hex.pm/packages/elastix)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/elastix/)
+[![Hex Downloads](https://img.shields.io/hexpm/dt/elastix.svg)](https://hex.pm/packages/elastix)
+[![WTFPL](https://img.shields.io/badge/license-WTFPL-brightgreen.svg?style=flat)](https://www.tldrlegal.com/l/wtfpl)
+[![Last Updated](https://img.shields.io/github/last-commit/werbitzky/elastix.svg)](https://github.com/werbitzky/elastix/commits/master)
 
 A DSL-free Elasticsearch client for Elixir.
 
@@ -7,17 +14,19 @@ A DSL-free Elasticsearch client for Elixir.
 * [Documentation on hexdocs.pm](https://hexdocs.pm/elastix/)
 * [Latest Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 
-Even though the [documentation](https://hexdocs.pm/elastix/) is pretty scarce right now, we're working on improving it. If you want to help with that you're definitely welcome 🤗
+Even though the [documentation](https://hexdocs.pm/elastix/) is pretty scarce right now, we're working on improving it. If you want to help with that you're definitely welcome. 🤗
 
 This README contains most of the information you should need to get started, if you can't find what you're looking for, either look at the tests or file an issue!
 
 ## Installation
 
-Add `elastix` to your list of dependencies in `mix.exs`:
+Add `:elastix` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:elastix, ">= 0.0.0"}]
+  [
+    {:elastix, ">= 0.0.0"}
+  ]
 end
 ```
 
@@ -140,7 +149,7 @@ $ mix deps.get
 $ mix test
 ```
 
-## License
+## Copyright and License
 
 Copyright © 2017 El Werbitzky werbitzky@gmail.com
 
