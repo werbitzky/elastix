@@ -20,4 +20,17 @@ defmodule Elastix.Alias do
     prepare_url(elastic_url, ["_aliases"])
     |> HTTP.post(JSON.encode!(%{actions: actions}))
   end
+
+  @doc """
+  Returns information about one or more index aliases.
+
+  ## Examples
+      iex> Elastix.Alias.get("http://localhost:9200", "alias1")
+      {:ok, %HTTPoison.Response{...}}
+  """
+  @spec get(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
+  def get(elastic_url, name \\ "") do
+    prepare_url(elastic_url, ["_alias", name])
+    |> HTTP.get()
+  end
 end
