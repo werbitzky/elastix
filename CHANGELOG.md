@@ -1,8 +1,15 @@
-## 0.9.0
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 0.9.0 - 2021-03-20
 
 - Add ability to pass httpoison options to get, status and restore snapshot functions
 
-## 0.8.0
+## 0.8.0 - 2020-03-10
 
 ### Breaking changes
 
@@ -12,20 +19,20 @@
 
 - Add support for custom httpoison options in snapshot delete function
 
-## 0.7.1
+## 0.7.1 - 2018-11-19
 
 ### Package improvements
 
 - Improve package description
 
-## 0.7.0
+## 0.7.0 - 2018-11-16
 
 ### Improvements
 
 - Add support for custom httpoison options on bulk calls
 - Support HTTPoison 1.4
 
-## 0.6.0
+## 0.6.0 - 2018-04-27
 
 ### Improvements
 
@@ -38,7 +45,7 @@
 - Add `count` to the Search module
 - Allow trailing slashes in URL
 
-## 0.5.0
+## 0.5.0 - 2017-10-04
 
 ### Improvements
 
@@ -50,7 +57,7 @@
 - remove double backslash from Document.make_path
 - add basic scrolling api
 
-## 0.4.0
+## 0.4.0 - 2017-04-04
 
 ### Improvements
 
@@ -62,7 +69,7 @@
 
 - don't strip return atoms
 
-## 0.3.0
+## 0.3.0 - 2017-02-28
 
 ### Improvements
 
@@ -70,7 +77,7 @@
 - add support for bulk requests
 - bump up library versions (credo, httpoison, mix_test_watch)
 
-## 0.2.0
+## 0.2.0 - 2016-05-20
 
 ### Improvements:
 
@@ -79,7 +86,7 @@
 - add support for index refresh
 - add shield support
 
-## 0.1.1
+## 0.1.1 - 2016-04-06
 
 ### Improvements:
 
@@ -87,7 +94,7 @@
 - use Application.get_env dynamically for configuration (will prevent Elastix from freezing configuration during compile-time)
 - make code credo-conform
 
-## 0.1.0
+## 0.1.0 - 2015-11-12
 
 ### Improvements:
 

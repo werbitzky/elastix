@@ -1,43 +1,33 @@
 defmodule Elastix.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/werbitzky/elastix"
   @version "0.9.0"
 
   def project do
     [
       app: :elastix,
+      name: "Elastix",
       version: @version,
       elixir: "~> 1.6",
-      description: "A DSL-free Elastic / Elasticsearch client for Elixir.",
-      package: package(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      package: package(),
       deps: deps(),
-      name: "Elastix",
       docs: docs()
     ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :httpoison, :retry]]
+    [
+      applications: [:logger, :httpoison, :retry]
+    ]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.24", only: :dev},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:credo, "~> 0.6", only: [:dev, :test]},
       {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
       {:poison, "~> 3.0 or ~> 4.0", optional: true},
@@ -48,10 +38,14 @@ defmodule Elastix.Mixfile do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README.md"],
+      description: "A DSL-free Elastic / Elasticsearch client for Elixir.",
+      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", "LICENSE"],
       maintainers: ["El Werbitzky", "evuez <helloevuez@gmail.com>"],
-      licenses: ["WTFPL 2"],
-      links: %{"GitHub" => "https://github.com/werbitzky/elastix"}
+      licenses: ["WTFPL-2"],
+      links: %{
+        "Changelog" => "https://hexdocs.pm/elastix/changelog.html",
+        "GitHub" => @source_url
+      }
     ]
   end
 
@@ -61,8 +55,16 @@ defmodule Elastix.Mixfile do
 
   defp docs do
     [
+      extras: [
+        "CHANGELOG.md",
+        {:"LICENSE", [title: "License"]},
+        "README.md",
+        "pages/custom-json-codec.md"
+      ],
       main: "readme",
-      extras: ["README.md", "pages/custom-json-codec.md"]
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      formatters: ["html"]
     ]
   end
 end
