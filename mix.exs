@@ -2,7 +2,7 @@ defmodule Elastix.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/werbitzky/elastix"
-  @version "0.9.0"
+  @version "0.10.0"
 
   def project do
     [
@@ -57,7 +57,7 @@ defmodule Elastix.Mixfile do
     [
       extras: [
         "CHANGELOG.md",
-        {:"LICENSE", [title: "License"]},
+        {:LICENSE, [title: "License"]},
         "README.md",
         "pages/custom-json-codec.md"
       ],
