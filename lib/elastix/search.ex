@@ -118,12 +118,10 @@ defmodule Elastix.Search do
 
   @doc false
   def make_path(index, types, query_params, api_type \\ "_search") do
-    path_root = "/#{index}"
-
     path =
       case types do
-        [] -> path_root
-        _ -> path_root <> "/" <> Enum.join(types, ",")
+        [] -> index
+        _ -> index <> "/" <> Enum.join(types, ",")
       end
 
     full_path = "#{path}/#{api_type}"

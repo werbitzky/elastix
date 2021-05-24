@@ -8,8 +8,14 @@ defmodule Elastix.HTTP do
   @type resp :: {:ok, HTTPoison.Response.t()} | {:error, HTTPoison.Error.t()}
 
   @doc false
-  def prepare_url(url, path) when is_binary(path), do: URI.merge(url, path) |> to_string
-  def prepare_url(url, parts) when is_list(parts), do: prepare_url(url, Path.join(parts))
+  def prepare_url(url, path) when is_binary(path) do
+    "#{url}/"
+    |> URI.merge(String.trim_leading(path, "/"))
+    |> to_string
+  end
+
+  def prepare_url(url, parts) when is_list(parts),
+    do: prepare_url("#{url}/", Path.join(parts))
 
   @doc false
   def request(method, url, body \\ "", headers \\ [], options \\ []) do
