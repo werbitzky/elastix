@@ -68,7 +68,7 @@ defmodule Elastix.Index do
       {:ok, response} ->
         case response.status_code do
           200 -> {:ok, true}
-          404 -> {:ok, false}
+          _ -> {:ok, false}
         end
 
       err ->
