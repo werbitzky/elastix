@@ -28,7 +28,7 @@ defmodule Elastix.Search do
       {:ok, %HTTPoison.Response{...}}
 
   """
-  @spec search(binary, binary, list, map | list) :: HTTP.resp
+  @spec search(elastic_url :: String.t(), index :: String.t() | list, types :: list, data :: map | list) :: HTTP.resp()
   def search(elastic_url, index, types, query) do
     search(elastic_url, index, types, query, [])
   end
@@ -38,7 +38,14 @@ defmodule Elastix.Search do
 
   See [`HTTPoison.request/5`](https://hexdocs.pm/httpoison/HTTPoison.html#request/5) for options.
   """
-  @spec search(binary, binary, list, map | list, Keyword.t, Keyword.t) :: HTTP.resp
+  @spec search(
+          elastic_url :: String.t(), 
+          index :: String.t(), 
+          types :: list, 
+          data :: map | list, 
+          query_params :: Keyword.t(), 
+          options :: Keyword.t()
+        ) :: HTTP.resp()
   def search(elastic_url, index, types, query, query_params, httpoison_options \\ [])
 
   def search(elastic_url, index, types, query, query_params, httpoison_options) when is_list(query) do

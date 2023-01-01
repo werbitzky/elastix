@@ -6,6 +6,7 @@ defmodule Elastix.SearchTest do
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)
+  @test_index_2 Elastix.config(:test_index_2)
   @document_data %{
     user: "werbitzky",
     post_date: "2009-11-15T14:12:12",
@@ -24,6 +25,7 @@ defmodule Elastix.SearchTest do
 
   setup do
     Index.delete(@test_url, @test_index)
+    Index.delete(@test_url, @test_index_2)
 
     :ok
   end
@@ -53,6 +55,17 @@ defmodule Elastix.SearchTest do
 
     {:error, %HTTPoison.Error{reason: :timeout}} =
       Search.search(@test_url, @test_index, [], @query_data, [], recv_timeout: 0)
+  end
+
+  test "search accepts a list of indexes" do
+    Document.index(@test_url, @test_index, "message", 1, @document_data, refresh: true)
+    Document.index(@test_url, @test_index_2, "message", 1, @document_data, refresh: true)
+
+    {:ok, %Response{body: body} = response} =
+      Search.search(@test_url, [@test_index, @test_index_2], [], @query_data)
+
+    assert response.status_code == 200
+    assert length(body["hits"]["hits"]) === 2
   end
 
   test "search accepts a list of requests" do

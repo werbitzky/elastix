@@ -188,6 +188,34 @@ defmodule Elastix.Document do
     HTTP.post(url, JSON.encode!(data))
   end
 
+  @doc """
+  Updates the documents matching the given `query` using the
+  [Update By Query API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html).
+
+  ## Examples
+
+      iex> Elastix.Document.update_by_query("http://localhost:9200", "twitter", %{"term" => %{"user" => "kimchy"}}, %{inline: "ctx._source.user = 'kimchy updated'", lang: "painless"})
+      {:ok, %HTTPoison.Response{...}}
+  """
+  @spec update_by_query(
+          elastic_url :: String.t(),
+          index :: String.t(),
+          query :: map,
+          script :: map,
+          query_params :: Keyword.t()
+        ) :: HTTP.resp()
+  def update_by_query(elastic_url, index_name, query, script, query_params \\ []) do
+    elastic_url
+    |> prepare_url([index_name, "_update_by_query"])
+    |> HTTP.append_query_string(query_params)
+    |> HTTP.post(
+      JSON.encode!(%{
+        script: script,
+        query: query
+      })
+    )
+  end
+
   @doc false
   @spec make_path(binary, map) :: binary
   def make_path(index, metadata \\ %{})

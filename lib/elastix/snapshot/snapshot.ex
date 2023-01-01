@@ -54,19 +54,20 @@ defmodule Elastix.Snapshot.Snapshot do
       }
 
   """
-  @spec create(binary, binary, binary, map, Keyword.t) :: HTTP.resp
-  def create(elastic_url, repo, snapshot, config \\ %{}, query_params \\ []) do
+
+  @spec create(binary, binary, binary, map, Keyword.t, Keyword.t) :: HTTP.resp
+  def create(elastic_url, repo, snapshot, config \\ %{}, query_params \\ [], options \\ []) do
     url = HTTP.make_url(elastic_url, make_path(repo, snapshot), query_params)
-    HTTP.put(url, JSON.encode!(config))
+    HTTP.put(url, JSON.encode!(config), Keyword.get(options, :httpoison_options, []))
   end
 
   @doc """
   Restore previously created snapshot.
   """
-  @spec restore(binary, binary, binary, map) :: HTTP.resp
-  def restore(elastic_url, repo, snapshot, data \\ %{}) do
+  @spec restore(binary, binary, binary, map, Keyword.t) :: HTTP.resp
+  def restore(elastic_url, repo, snapshot, data \\ %{}, options \\ []) do
     url = HTTP.make_url(elastic_url, [make_path(repo, snapshot), "_restore"])
-    HTTP.post(url, JSON.encode!(data))
+    HTTP.post(url, JSON.encode!(data), Keyword.get(options, :httpoison_options, []))
   end
 
   @doc """
@@ -87,7 +88,7 @@ defmodule Elastix.Snapshot.Snapshot do
   @spec status(binary, binary, binary) :: HTTP.resp
   def status(elastic_url, repo \\ "", snapshot \\ "") do
     url = HTTP.make_url(elastic_url, [make_path(repo, snapshot), "_status"])
-    HTTP.get(url)
+    HTTP.get(url, [], Keyword.get(options, :httpoison_options, []))
   end
 
   @doc """
@@ -95,7 +96,7 @@ defmodule Elastix.Snapshot.Snapshot do
 
   If repo_name and snapshot_name is specified, will retrieve information about
   that snapshot. If repo_name is specified, will retrieve information about
-  all snapshots in that repository. Oterwise, will retrieve information about
+  all snapshots in that repository. Otherwise, will retrieve information about
   all snapshots.
 
   ## Examples
@@ -149,28 +150,46 @@ defmodule Elastix.Snapshot.Snapshot do
       iex> Elastix.Snapshot.get(elastic_url)
 
   """
+
   @spec get(binary, binary, binary) :: HTTP.resp
-  def get(elastic_url, repo_name \\ "", snapshot_name \\ "_all") do
+  def get(elastic_url, repo_name \\ "", snapshot_name \\ "_all", options \\ []) do
     url = HTTP.make_url(elastic_url, make_path(repo_name, snapshot_name))
-    HTTP.get(url)
+    HTTP.get(url, [], Keyword.get(options, :httpoison_options, []))
   end
 
   @doc """
   Delete snapshot from repository.
 
+  This can also be used to stop currently running snapshot and restore
+  operations. Snapshot deletes can be slow, so you can pass in
+  HTTPoison/Hackney options in an `httpoison_options` keyword argument like
+  `:recv_timeout` to wait longer.
+
+  ## Examples
+
+      iex> Elastix.Snapshot.Snapshot.delete("http://localhost:9200", "backups", "snapshot_123", httpoison_options: [recv_timeout: 30_000])
+      {:ok, %HTTPoison.Response{...}}
+
+  """
+  @spec delete(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, %HTTPoison.Response{}}
+  def delete(elastic_url, repo_name, snapshot_name, options \\ []) do
+    elastic_url
+    |> prepare_url(make_path(repo_name, snapshot_name))
+    |> HTTP.delete([], _make_httpoison_options(options))
+  end
+
   This can also be used to stop currently running snapshot and restore operations.
   """
   @spec delete(binary, binary, binary) :: HTTP.resp
-  def delete(elastic_url, repo, snapshot) do
+  def delete(elastic_url, repo, snapshot, options \\ []) do
     url = HTTP.make_url(elastic_url, make_path(repo, snapshot))
-    HTTP.delete(url)
+    HTTP.delete(url, [], Keyword.get(options, :httpoison_options, []))
   end
 
- @doc false
+  @doc false
   @spec make_path(binary | nil, binary | nil) :: binary
   def make_path(repo, snapshot)
   def make_path(nil, nil), do: "/_snapshot"
   def make_path(repo, nil), do: "/_snapshot/#{repo}"
   def make_path(repo, snapshot), do: "/_snapshot/#{repo}/#{snapshot}"
-
 end
