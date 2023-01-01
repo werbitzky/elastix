@@ -133,7 +133,7 @@ defmodule Elastix.DocumentTest do
       assert response.status_code == 404
     end
 
-    test "delete by query should remove all docs that match" do
+    test "delete by query should remove all docs that match", %{version: version} do
       Document.index(@test_url, @test_index, "message", 1, @data, refresh: true)
       Document.index(@test_url, @test_index, "message", 2, @data, refresh: true)
 
@@ -144,7 +144,11 @@ defmodule Elastix.DocumentTest do
 
       {:ok, response} = Search.search(@test_url, @test_index, ["message"], match_all_query)
       assert response.status_code == 200
-      assert response.body["hits"]["total"] == 3
+      if version >= 6.0 do
+        assert response.body["hits"]["total"] == %{"relation" => "eq", "value" => 3}
+      else
+        assert response.body["hits"]["total"] == 3
+      end
 
       query = %{"query" => %{"match" => %{"user" => "örelbörel"}}}
 
@@ -155,7 +159,11 @@ defmodule Elastix.DocumentTest do
 
       {:ok, response} = Search.search(@test_url, @test_index, ["message"], match_all_query)
       assert response.status_code == 200
-      assert response.body["hits"]["total"] == 1
+      if version >= 6.0 do
+        assert response.body["hits"]["total"] == %{"relation" => "eq", "value" => 1}
+      else
+        assert response.body["hits"]["total"] == 1
+      end
     end
   end
 
@@ -174,7 +182,7 @@ defmodule Elastix.DocumentTest do
       assert response.status_code == 404
     end
 
-    test "delete by query should remove all docs that match" do
+    test "delete by query should remove all docs that match", %{version: version} do
       Document.index(@test_url, @test_index, @data, %{id: 1}, refresh: true)
       Document.index(@test_url, @test_index, @data, %{id: 2}, refresh: true)
 
@@ -185,7 +193,11 @@ defmodule Elastix.DocumentTest do
 
       {:ok, response} = Search.search(@test_url, @test_index, [], match_all_query)
       assert response.status_code == 200
-      assert response.body["hits"]["total"] == 3
+      if version >= 6.0 do
+        assert response.body["hits"]["total"] == %{"relation" => "eq", "value" => 3}
+      else
+        assert response.body["hits"]["total"] == 3
+      end
 
       query = %{"query" => %{"match" => %{"user" => "örelbörel"}}}
 
@@ -194,7 +206,11 @@ defmodule Elastix.DocumentTest do
 
       {:ok, response} = Search.search(@test_url, @test_index, [], match_all_query)
       assert response.status_code == 200
-      assert response.body["hits"]["total"] == 1
+      if version >= 6.0 do
+        assert response.body["hits"]["total"] == %{"relation" => "eq", "value" => 1}
+      else
+        assert response.body["hits"]["total"] == 1
+      end
     end
   end
 

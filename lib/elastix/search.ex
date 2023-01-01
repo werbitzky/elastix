@@ -39,11 +39,11 @@ defmodule Elastix.Search do
   See [`HTTPoison.request/5`](https://hexdocs.pm/httpoison/HTTPoison.html#request/5) for options.
   """
   @spec search(
-          elastic_url :: String.t(), 
-          index :: String.t(), 
-          types :: list, 
-          data :: map | list, 
-          query_params :: Keyword.t(), 
+          elastic_url :: String.t(),
+          index :: String.t(),
+          types :: list,
+          data :: map | list,
+          query_params :: Keyword.t(),
           options :: Keyword.t()
         ) :: HTTP.resp()
   def search(elastic_url, index, types, query, query_params, httpoison_options \\ [])
@@ -111,9 +111,13 @@ defmodule Elastix.Search do
   @doc false
   @spec make_path(binary, [binary], binary) :: binary
   def make_path(index, types, api_type \\ "_search")
-  def make_path(index, [], api_type), do: "/#{index}/#{api_type}"
+  def make_path(index, [], api_type) do
+    index_path = index |> List.wrap() |> Enum.join(",")
+    "/#{index_path}/#{api_type}"
+  end
   def make_path(index, types, api_type) do
+    index_path = index |> List.wrap() |> Enum.join(",")
     types = Enum.join(types, ",")
-    "/#{index}/#{types}/#{api_type}"
+    "/#{index_path}/#{types}/#{api_type}"
   end
 end

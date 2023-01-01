@@ -34,7 +34,7 @@ defmodule Elastix.Alias do
   """
   @spec get(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def get(elastic_url, name \\ "") do
-    prepare_url(elastic_url, ["_alias", name])
-    |> HTTP.get()
+    url = HTTP.make_url(elastic_url, ["_alias", name])
+    HTTP.get(url)
   end
 end

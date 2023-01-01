@@ -85,8 +85,8 @@ defmodule Elastix.Snapshot.Snapshot do
       iex> Elastix.Snapshot.status(elastic_url, repository, snapshot)
 
   """
-  @spec status(binary, binary, binary) :: HTTP.resp
-  def status(elastic_url, repo \\ "", snapshot \\ "") do
+  @spec status(binary, binary, binary, Keyword.t()) :: HTTP.resp
+  def status(elastic_url, repo \\ "", snapshot \\ "", options \\ []) do
     url = HTTP.make_url(elastic_url, [make_path(repo, snapshot), "_status"])
     HTTP.get(url, [], Keyword.get(options, :httpoison_options, []))
   end
@@ -169,16 +169,6 @@ defmodule Elastix.Snapshot.Snapshot do
 
       iex> Elastix.Snapshot.Snapshot.delete("http://localhost:9200", "backups", "snapshot_123", httpoison_options: [recv_timeout: 30_000])
       {:ok, %HTTPoison.Response{...}}
-
-  """
-  @spec delete(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, %HTTPoison.Response{}}
-  def delete(elastic_url, repo_name, snapshot_name, options \\ []) do
-    elastic_url
-    |> prepare_url(make_path(repo_name, snapshot_name))
-    |> HTTP.delete([], _make_httpoison_options(options))
-  end
-
-  This can also be used to stop currently running snapshot and restore operations.
   """
   @spec delete(binary, binary, binary) :: HTTP.resp
   def delete(elastic_url, repo, snapshot, options \\ []) do

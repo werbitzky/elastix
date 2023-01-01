@@ -206,8 +206,8 @@ defmodule Elastix.Document do
         ) :: HTTP.resp()
   def update_by_query(elastic_url, index_name, query, script, query_params \\ []) do
     elastic_url
-    |> prepare_url([index_name, "_update_by_query"])
-    |> HTTP.append_query_string(query_params)
+    |> HTTP.make_url([index_name, "_update_by_query"])
+    |> HTTP.add_query_params(query_params)
     |> HTTP.post(
       JSON.encode!(%{
         script: script,
