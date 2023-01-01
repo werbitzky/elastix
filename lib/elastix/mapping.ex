@@ -2,143 +2,161 @@ defmodule Elastix.Mapping do
   @moduledoc """
   The mapping API is used to define how documents are stored and indexed.
 
-  [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
+  [Elastic docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
+
+  [Removal of mapping types](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html)
+
   """
-  import Elastix.HTTP, only: [prepare_url: 2]
   alias Elastix.{HTTP, JSON}
 
   @doc """
-  Creates a new mapping.
+  Add field to an existing mapping.
+
+  [Elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#add-field-mapping)
 
   ## Examples
 
-      iex> mapping = %{properties: %{user: %{type: "text"}, post_date: %{type: "date"}, message: %{type: "text"}}}
-      iex> Elastix.Mapping.put("http://localhost:9200", "twitter", "tweet", mapping)
-      {:ok, %HTTPoison.Response{...}}
-  """
-  @spec put(
-          elastic_url :: String.t(),
-          index_names :: String.t() | list,
-          type_name :: String.t(),
-          data :: map,
-          query_params :: Keyword.t()
-        ) :: HTTP.resp()
-  def put(elastic_url, index_names, type_name, data, query_params \\ [])
+  New API
 
-  def put(elastic_url, index_names, type_name, data, query_params)
-      when is_list(index_names) do
-    prepare_url(elastic_url, make_path(index_names, [type_name], query_params))
-    |> HTTP.put(JSON.encode!(data))
+      iex> mappings = %{properties: %{user: %{type: "text"}, post_date: %{type: "date"}, message: %{type: "text"}}}
+      iex> Elastix.Mapping.put("http://localhost:9200", "twitter", mappings)
+      {:ok, %HTTPoison.Response{...}}
+
+  Old API with mapping types
+
+      iex> mappings = %{properties: %{user: %{type: "text"}, post_date: %{type: "date"}, message: %{type: "text"}}}
+      iex> Elastix.Mapping.put("http://localhost:9200", "twitter", "tweet", mappings)
+      {:ok, %HTTPoison.Response{...}}
+
+  """
+  # Support the old Elasticsearch API with mapping types and the new API
+  # without mapping types using the same natural function name.
+  @spec put(binary, binary | [binary], binary | map, map | Keyword.t, Keyword.t) :: HTTP.resp
+
+  def put(elastic_url, index, type_or_mappings, mappings_or_query_params \\ [], query_params \\ [])
+
+  # Old: @spec put(binary, binary | [binary], binary, map, Keyword.t) :: HTTP.resp
+  def put(elastic_url, indexes, type, mappings, query_params) when is_binary(type) do
+    url = HTTP.make_url(elastic_url, put_path(indexes, type, mappings, query_params))
+    HTTP.put(url, JSON.encode!(mappings))
   end
 
-  def put(elastic_url, index_name, type_name, data, query_params),
-    do: put(elastic_url, [index_name], type_name, data, query_params)
+  # New: @spec put(binary, binary, map, Keyword.t) :: HTTP.resp
+  def put(elastic_url, index, mappings, query_params, unused) when is_map(mappings) do
+    # New API
+    url = HTTP.make_url(elastic_url, put_path(index, mappings, query_params, unused))
+    HTTP.put(url, JSON.encode!(mappings))
+  end
+
+  @doc false
+  @spec put_path(binary | [binary], binary | map, map | Keyword.t, Keyword.t) :: binary
+  def put_path(indexes, type_or_mappings, mappings_or_query_params \\ [], query_params \\ [])
+  # Old
+  def put_path(indexes, type, mappings, query_params) when is_list(indexes) and is_binary(type) do
+    indexes = Enum.join(indexes, ",")
+    put_path(indexes, type, mappings, query_params)
+  end
+  def put_path(indexes, type, _mappings, query_params) when is_binary(type) do
+    path = "/#{indexes}/_mapping/#{type}"
+    HTTP.add_query_params(path, query_params)
+  end
+  # New
+  def put_path(index, mappings, query_params, _unused) when is_map(mappings) do
+    path = "/#{index}/_mapping"
+    HTTP.add_query_params(path, query_params)
+  end
 
   @doc """
-  Gets info on one or a list of mappings for one or a list of indices.
+  Get mappings for index.
+
+  [New Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/mapping.html)
+
+  [Old Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/5.5/mapping.html)
+
+  Accepts a single index or list of indexes.
+  Accepts a single type or list of types.
+
+  https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#view-mapping
 
   ## Examples
+
+      iex> Elastix.Mapping.get("http://localhost:9200", "twitter")
+      {:ok, %HTTPoison.Response{...}}
 
       iex> Elastix.Mapping.get("http://localhost:9200", "twitter", "tweet")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec get(
-          elastic_url :: String.t(),
-          index_names :: String.t() | list,
-          type_names :: String.t() | list,
-          query_params :: Keyword.t()
-        ) :: HTTP.resp()
-  def get(elastic_url, index_names, type_names, query_params \\ [])
-
-  def get(elastic_url, index_names, type_names, query_params)
-      when is_list(type_names) and is_list(index_names) do
-    prepare_url(elastic_url, make_path(index_names, type_names, query_params))
-    |> HTTP.get()
+  @spec get(binary, binary | [binary], binary | [binary] | Keyword.t, Keyword.t) :: HTTP.resp
+  # New: @spec get(binary, binary, Keyword.t, Keyword.t) :: HTTP.resp
+  # Old: @spec get(binary, binary | [binary], binary | [binary], Keyword.t) :: HTTP.resp
+  def get(elastic_url, indexes, types_or_query_params \\ [], query_params \\ []) do
+    url = HTTP.make_url(elastic_url, get_path(indexes, types_or_query_params, query_params))
+    HTTP.get(url)
   end
 
-  def get(elastic_url, index_names, type_name, query_params)
-      when is_list(index_names) do
-    get(elastic_url, index_names, [type_name], query_params)
+  @spec get_path(binary | [binary], binary | [binary] | Keyword.t, Keyword.t) :: binary
+  # New: @spec get(binary, Keyword.t, Keyword.t) :: binary
+  def get_path(index, [], []) when is_binary(index) do
+    "/#{index}/_mapping"
+  end
+  def get_path(index, [value | _rest] = query_params, []) when is_binary(index) and is_tuple(value) do
+    HTTP.add_query_params("/#{index}/_mapping", query_params)
   end
 
-  def get(elastic_url, index_name, type_names, query_params)
-      when is_list(type_names) do
-    get(elastic_url, [index_name], type_names, query_params)
+  # Old: @spec get(binary | [binary], binary | [binary], Keyword.t) :: binary
+  def get_path(indexes, [value | _rest] = types, query_params) when is_list(indexes) and is_binary(value) do
+    indexes = Enum.join(indexes, ",")
+    types = Enum.join(types, ",")
+    HTTP.add_query_params("/#{indexes}/_mapping/#{types}", query_params)
   end
-
-  def get(elastic_url, index_name, type_name, query_params),
-    do: get(elastic_url, [index_name], [type_name], query_params)
+  def get_path(indexes, type, query_params) when is_list(indexes) and is_binary(type) do
+    indexes = Enum.join(indexes, ",")
+    HTTP.add_query_params("/#{indexes}/_mapping/#{type}", query_params)
+  end
+  def get_path(index, [value | _rest] = types, query_params) when is_binary(index) and is_binary(value) do
+    types = Enum.join(types, ",")
+    HTTP.add_query_params("/#{index}/_mapping/#{types}", query_params)
+  end
+  def get_path(index, type, query_params) when is_binary(index) and is_binary(type) do
+    HTTP.add_query_params("/#{index}/_mapping/#{type}", query_params)
+  end
 
   @doc """
-  Gets info on every mapping.
+  Get info on all mappings.
 
   ## Examples
 
       iex> Elastix.Mapping.get_all("http://localhost:9200")
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec get_all(elastic_url :: String.t(), query_params :: Keyword.t()) :: HTTP.resp()
+  @spec get_all(binary, Keyword.t) :: HTTP.resp
   def get_all(elastic_url, query_params \\ []) do
-    prepare_url(elastic_url, make_all_path(query_params))
-    |> HTTP.get()
+    url = HTTP.make_url(elastic_url, "_mapping", query_params)
+    HTTP.get(url)
   end
 
   @doc """
-  Gets info on every given mapping.
+  Get info on all mappings for types.
 
   ## Examples
 
-      iex> Elastix.Mapping.get_all("http://localhost:9200", ["tweet", "user"])
+      iex> Elastix.Mapping.get_all_with_type("http://localhost:9200", ["tweet", "user"])
       {:ok, %HTTPoison.Response{...}}
+
   """
-  @spec get_all_with_type(
-          elastic_url :: String.t(),
-          type_names :: String.t() | list,
-          query_params :: Keyword.t()
-        ) :: HTTP.resp()
-  def get_all_with_type(elastic_url, type_names, query_params \\ [])
-
-  def get_all_with_type(elastic_url, type_names, query_params)
-      when is_list(type_names) do
-    prepare_url(elastic_url, make_all_path(type_names, query_params))
-    |> HTTP.get()
-  end
-
-  def get_all_with_type(elastic_url, type_name, query_params),
-    do: get_all_with_type(elastic_url, [type_name], query_params)
-
-  @doc false
-  def make_path(index_names, type_names, query_params) do
-    index_names = Enum.join(index_names, ",")
-    type_names = Enum.join(type_names, ",")
-
-    path = "/#{index_names}/_mapping/#{type_names}"
-
-    case query_params do
-      [] -> path
-      _ -> HTTP.append_query_string(path, query_params)
-    end
+  @spec get_all_with_type(binary, [binary], Keyword.t) :: HTTP.resp
+  def get_all_with_type(elastic_url, types, query_params \\ []) do
+    url = HTTP.make_url(elastic_url, make_all_path(types), query_params)
+    HTTP.get(url)
   end
 
   @doc false
-  def make_all_path(query_params) do
-    path = "/_mapping"
-
-    case query_params do
-      [] -> path
-      _ -> HTTP.append_query_string(path, query_params)
-    end
+  @spec make_all_path([binary]) :: binary
+  def make_all_path(types) when is_list(types) do
+    types = Enum.join(types, ",")
+    "/_mapping/#{types}"
   end
 
-  @doc false
-  def make_all_path(type_names, query_params) do
-    type_names = Enum.join(type_names, ",")
-
-    path = "/_mapping/#{type_names}"
-
-    case query_params do
-      [] -> path
-      _ -> HTTP.append_query_string(path, query_params)
-    end
-  end
 end

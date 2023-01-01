@@ -1,25 +1,25 @@
 defmodule Elastix.HTTP do
   @moduledoc """
-  A thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper.
+  A thin wrapper on [HTTPoison](https://github.com/edgurgel/httpoison).
   """
   use HTTPoison.Base
   alias Elastix.JSON
 
   @type resp :: {:ok, HTTPoison.Response.t()} | {:error, HTTPoison.Error.t()}
 
-  @doc false
-  def prepare_url(url, path) when is_binary(path), do: URI.merge(url, path) |> to_string
-  def prepare_url(url, parts) when is_list(parts), do: prepare_url(url, Path.join(parts))
+  @doc "Create URL from base URL, path components and query params."
+  @spec make_url(binary, binary | [binary], Enum.t) :: binary
+  def make_url(url, path, query_params \\ [])
+  def make_url(url, path, query_params) when is_list(path) do
+    make_url(url, Path.join(path), query_params)
+  end
+  def make_url(url, path, query_params) do
+    URI.merge(url, add_query_params(path, query_params)) |> to_string
+  end
 
   @doc false
   def request(method, url, body \\ "", headers \\ [], options \\ []) do
-    query_url =
-      if Keyword.has_key?(options, :params) do
-        url <> "?" <> URI.encode_query(options[:params])
-      else
-        url
-      end
-
+    query_url = add_query_params(url, options[:params])
     full_url = to_string(query_url)
     body = process_request_body(body)
 
@@ -51,32 +51,51 @@ defmodule Elastix.HTTP do
   end
 
   @doc false
+  @spec process_response_body(binary) :: term
   def process_response_body(""), do: ""
-
-  def process_response_body(body) do
-    case body |> to_string |> JSON.decode() do
-      {:error, _} -> body
-      {:ok, decoded} -> decoded
+  def process_response_body(body) when is_binary(body) do
+    case JSON.decode(body) do
+      {:error, _} ->
+        body
+      {:ok, decoded} ->
+        decoded
     end
+  end
+  def process_response_body(body) do
+    process_response_body(to_string(body))
   end
 
   @doc """
-  Encodes an enumerable (`params`) into a query string and appends it to `root`.
+  Add query parameters to end of path.
 
   ## Examples
 
-      iex> Elastix.HTTP.append_query_string("/path", %{a: 1, b: 2})
+      iex> Elastix.HTTP.add_query_params("/path", a: 1, b: 2)
       "/path?a=1&b=2"
+
+      iex> Elastix.HTTP.add_query_params("/path", %{a: 1, b: 2})
+      "/path?a=1&b=2"
+
   """
-  @spec append_query_string(String.t(), term()) :: String.t()
-  def append_query_string(root, params), do: "#{root}?#{URI.encode_query(params)}"
+  @spec add_query_params(binary, Enum.t | nil) :: binary
+  def add_query_params(url, params)
+  def add_query_params(url, nil), do: url
+  def add_query_params(url, []), do: url
+  def add_query_params(url, map) when is_map(map) and map_size(map) == 0, do: url
+  def add_query_params(url, params), do: url <> "?" <> URI.encode_query(params)
 
   defp default_httpoison_options do
     Elastix.config(:httpoison_options, [])
   end
 
-  defp add_content_type_header(headers) do
-    [{"Content-Type", "application/json; charset=UTF-8"} | headers]
+  @doc false
+  @spec add_content_type_header([{binary, binary}]) :: [{binary, binary}]
+  def add_content_type_header(headers) do
+    if :proplists.is_defined("Content-Type", headers) do
+      headers
+    else
+      [{"Content-Type", "application/json; charset=UTF-8"} | headers]
+    end
   end
 
   defp add_shield_header(headers) do
