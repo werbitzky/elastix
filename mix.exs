@@ -2,14 +2,14 @@ defmodule Elastix.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/werbitzky/elastix"
-  @version "0.10.0"
+  @version "0.10.1"
 
   def project do
     [
       app: :elastix,
       name: "Elastix",
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.17.1",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -27,12 +27,12 @@ defmodule Elastix.Mixfile do
 
   defp deps do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:credo, "~> 0.6", only: [:dev, :test]},
-      {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
-      {:poison, "~> 3.0 or ~> 4.0", optional: true},
-      {:httpoison, "~> 1.4"},
-      {:retry, "~> 0.8"}
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test]},
+      {:mix_test_watch, "~> 1.0", only: [:test, :dev]},
+      {:poison, "~> 6.0", optional: true},
+      {:httpoison, "~> 2.0"},
+      {:retry, "~> 0.18"}
     ]
   end
 
