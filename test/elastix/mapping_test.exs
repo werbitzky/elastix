@@ -35,7 +35,10 @@ defmodule Elastix.MappingTest do
     %HTTPoison.Response{body: %{"version" => %{"number" => v}}, status_code: 200} =
       Elastix.HTTP.get!(@test_url)
 
-    v |> String.split([".", "-"]) |> Enum.take(3) |> Enum.map(&String.to_integer/1)
+    v
+    |> String.split([".", "-"])
+    |> Enum.take(3)
+    |> Enum.map(&String.to_integer/1)
     |> List.to_tuple()
   end
 

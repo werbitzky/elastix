@@ -21,18 +21,17 @@ defmodule Elastix.Mixfile do
 
   def application do
     [
-      applications: [:logger, :httpoison, :retry]
+      extra_applications: [:logger, :httpoison]
     ]
   end
 
   defp deps do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:credo, "~> 0.6", only: [:dev, :test]},
-      {:mix_test_watch, "~> 0.3", only: [:test, :dev]},
-      {:poison, "~> 3.0 or ~> 4.0", optional: true},
-      {:httpoison, "~> 1.4"},
-      {:retry, "~> 0.8"}
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test]},
+      {:jason, "~> 1.4", optional: true},
+      {:httpoison, "~> 2.2"},
+      {:retry, "~> 0.8", only: [:dev, :test]}
     ]
   end
 
@@ -40,8 +39,8 @@ defmodule Elastix.Mixfile do
     [
       description: "A DSL-free Elastic / Elasticsearch client for Elixir.",
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", "LICENSE"],
-      maintainers: ["El Werbitzky", "evuez <helloevuez@gmail.com>"],
-      licenses: ["WTFPL-2"],
+      maintainers: ["El Werbitzky", "evuez <helloevuez@gmail.com>", "Fabian Becker"],
+      licenses: ["MIT"],
       links: %{
         "Changelog" => "https://hexdocs.pm/elastix/changelog.html",
         "GitHub" => @source_url
