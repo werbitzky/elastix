@@ -9,6 +9,7 @@ defmodule Elastix.Snapshot.RepositoryTest do
   """
 
   use ExUnit.Case
+
   alias Elastix.Snapshot.Repository
 
   @test_url Elastix.config(:test_url)

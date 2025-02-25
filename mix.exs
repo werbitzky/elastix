@@ -31,7 +31,8 @@ defmodule Elastix.Mixfile do
       {:credo, "~> 1.7", only: [:dev, :test]},
       {:jason, "~> 1.4", optional: true},
       {:httpoison, "~> 2.2"},
-      {:retry, "~> 0.8", only: [:dev, :test]}
+      {:retry, "~> 0.8", only: [:dev, :test]},
+      {:styler, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]
   end
 

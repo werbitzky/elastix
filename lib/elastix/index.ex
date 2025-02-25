@@ -5,7 +5,9 @@ defmodule Elastix.Index do
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices.html)
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.{HTTP, JSON}
+
+  alias Elastix.HTTP
+  alias Elastix.JSON
 
   @doc """
   Creates a new index.
@@ -17,7 +19,8 @@ defmodule Elastix.Index do
   """
   @spec create(elastic_url :: String.t(), name :: String.t(), data :: map) :: HTTP.resp()
   def create(elastic_url, name, data) do
-    prepare_url(elastic_url, name)
+    elastic_url
+    |> prepare_url(name)
     |> HTTP.put(JSON.encode!(data))
   end
 
@@ -31,7 +34,8 @@ defmodule Elastix.Index do
   """
   @spec delete(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def delete(elastic_url, name) do
-    prepare_url(elastic_url, name)
+    elastic_url
+    |> prepare_url(name)
     |> HTTP.delete()
   end
 
@@ -45,7 +49,8 @@ defmodule Elastix.Index do
   """
   @spec get(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def get(elastic_url, name) do
-    prepare_url(elastic_url, name)
+    elastic_url
+    |> prepare_url(name)
     |> HTTP.get()
   end
 
@@ -64,7 +69,7 @@ defmodule Elastix.Index do
   @spec exists?(elastic_url :: String.t(), name :: String.t()) ::
           {:ok, boolean()} | {:error, HTTPoison.Error.t()}
   def exists?(elastic_url, name) do
-    case prepare_url(elastic_url, name) |> HTTP.head() do
+    case elastic_url |> prepare_url(name) |> HTTP.head() do
       {:ok, response} ->
         case response.status_code do
           200 -> {:ok, true}
@@ -87,7 +92,8 @@ defmodule Elastix.Index do
   """
   @spec refresh(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def refresh(elastic_url, name) do
-    prepare_url(elastic_url, [name, "_refresh"])
+    elastic_url
+    |> prepare_url([name, "_refresh"])
     |> HTTP.post("")
   end
 
@@ -102,7 +108,8 @@ defmodule Elastix.Index do
   """
   @spec open(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def open(elastic_url, name) do
-    prepare_url(elastic_url, [name, "_open"])
+    elastic_url
+    |> prepare_url([name, "_open"])
     |> HTTP.post("")
   end
 
@@ -117,7 +124,8 @@ defmodule Elastix.Index do
   """
   @spec close(elastic_url :: String.t(), name :: String.t()) :: HTTP.resp()
   def close(elastic_url, name) do
-    prepare_url(elastic_url, [name, "_close"])
+    elastic_url
+    |> prepare_url([name, "_close"])
     |> HTTP.post("")
   end
 end

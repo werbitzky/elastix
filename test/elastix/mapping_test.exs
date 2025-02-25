@@ -1,8 +1,9 @@
 defmodule Elastix.MappingTest do
   use ExUnit.Case
+
+  alias Elastix.Document
   alias Elastix.Index
   alias Elastix.Mapping
-  alias Elastix.Document
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)

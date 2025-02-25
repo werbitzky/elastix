@@ -5,7 +5,9 @@ defmodule Elastix.Mapping do
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html)
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.{HTTP, JSON}
+
+  alias Elastix.HTTP
+  alias Elastix.JSON
 
   @doc """
   Creates a new mapping.
@@ -25,9 +27,9 @@ defmodule Elastix.Mapping do
         ) :: HTTP.resp()
   def put(elastic_url, index_names, type_name, data, query_params \\ [])
 
-  def put(elastic_url, index_names, type_name, data, query_params)
-      when is_list(index_names) do
-    prepare_url(elastic_url, make_path(index_names, [type_name], query_params))
+  def put(elastic_url, index_names, type_name, data, query_params) when is_list(index_names) do
+    elastic_url
+    |> prepare_url(make_path(index_names, [type_name], query_params))
     |> HTTP.put(JSON.encode!(data))
   end
 
@@ -50,19 +52,17 @@ defmodule Elastix.Mapping do
         ) :: HTTP.resp()
   def get(elastic_url, index_names, type_names, query_params \\ [])
 
-  def get(elastic_url, index_names, type_names, query_params)
-      when is_list(type_names) and is_list(index_names) do
-    prepare_url(elastic_url, make_path(index_names, type_names, query_params))
+  def get(elastic_url, index_names, type_names, query_params) when is_list(type_names) and is_list(index_names) do
+    elastic_url
+    |> prepare_url(make_path(index_names, type_names, query_params))
     |> HTTP.get()
   end
 
-  def get(elastic_url, index_names, type_name, query_params)
-      when is_list(index_names) do
+  def get(elastic_url, index_names, type_name, query_params) when is_list(index_names) do
     get(elastic_url, index_names, [type_name], query_params)
   end
 
-  def get(elastic_url, index_name, type_names, query_params)
-      when is_list(type_names) do
+  def get(elastic_url, index_name, type_names, query_params) when is_list(type_names) do
     get(elastic_url, [index_name], type_names, query_params)
   end
 
@@ -79,7 +79,8 @@ defmodule Elastix.Mapping do
   """
   @spec get_all(elastic_url :: String.t(), query_params :: Keyword.t()) :: HTTP.resp()
   def get_all(elastic_url, query_params \\ []) do
-    prepare_url(elastic_url, make_all_path(query_params))
+    elastic_url
+    |> prepare_url(make_all_path(query_params))
     |> HTTP.get()
   end
 
@@ -98,9 +99,9 @@ defmodule Elastix.Mapping do
         ) :: HTTP.resp()
   def get_all_with_type(elastic_url, type_names, query_params \\ [])
 
-  def get_all_with_type(elastic_url, type_names, query_params)
-      when is_list(type_names) do
-    prepare_url(elastic_url, make_all_path(type_names, query_params))
+  def get_all_with_type(elastic_url, type_names, query_params) when is_list(type_names) do
+    elastic_url
+    |> prepare_url(make_all_path(type_names, query_params))
     |> HTTP.get()
   end
 

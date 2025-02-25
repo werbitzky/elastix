@@ -6,21 +6,16 @@ defmodule Elastix.Snapshot.Snapshot do
   """
 
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.{HTTP, JSON}
+
+  alias Elastix.HTTP
+  alias Elastix.JSON
 
   @doc """
   Creates a snapshot.
   """
   @spec create(String.t(), String.t(), String.t(), Map.t(), [tuple()], Keyword.t()) ::
-          {:ok, %HTTPoison.Response{}}
-  def create(
-        elastic_url,
-        repo_name,
-        snapshot_name,
-        data \\ %{},
-        query_params \\ [],
-        options \\ []
-      ) do
+          {:ok, HTTPoison.Response.t()}
+  def create(elastic_url, repo_name, snapshot_name, data \\ %{}, query_params \\ [], options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name, query_params))
     |> HTTP.put(JSON.encode!(data), [], _make_httpoison_options(options))
@@ -30,7 +25,7 @@ defmodule Elastix.Snapshot.Snapshot do
   Restores a previously created snapshot.
   """
   @spec restore(String.t(), String.t(), String.t(), Map.t(), Keyword.t()) ::
-          {:ok, %HTTPoison.Response{}}
+          {:ok, HTTPoison.Response.t()}
   def restore(elastic_url, repo_name, snapshot_name, data \\ %{}, options \\ []) do
     elastic_url
     |> prepare_url([make_path(repo_name, snapshot_name), "_restore"])
@@ -43,7 +38,7 @@ defmodule Elastix.Snapshot.Snapshot do
   in that repository. Otherwise, will retrieve the status of all snapshots.
   """
   @spec status(String.t(), String.t(), String.t(), Keyword.t()) ::
-          {:ok, %HTTPoison.Response{}}
+          {:ok, HTTPoison.Response.t()}
   def status(elastic_url, repo_name \\ "", snapshot_name \\ "", options \\ []) do
     elastic_url
     |> prepare_url([make_path(repo_name, snapshot_name), "_status"])
@@ -57,7 +52,7 @@ defmodule Elastix.Snapshot.Snapshot do
   all snapshots.
   """
   @spec get(String.t(), String.t(), String.t(), Keyword.t()) ::
-          {:ok, %HTTPoison.Response{}}
+          {:ok, HTTPoison.Response.t()}
   def get(elastic_url, repo_name \\ "", snapshot_name \\ "_all", options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name))
@@ -78,8 +73,7 @@ defmodule Elastix.Snapshot.Snapshot do
       {:ok, %HTTPoison.Response{...}}
 
   """
-  @spec delete(String.t(), String.t(), String.t(), Keyword.t()) ::
-          {:ok, %HTTPoison.Response{}}
+  @spec delete(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, HTTPoison.Response.t()}
   def delete(elastic_url, repo_name, snapshot_name, options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name))
@@ -102,13 +96,11 @@ defmodule Elastix.Snapshot.Snapshot do
   defp _make_base_path(nil, nil), do: "/_snapshot"
   defp _make_base_path(repo_name, nil), do: "/_snapshot/#{repo_name}"
 
-  defp _make_base_path(repo_name, snapshot_name),
-    do: "/_snapshot/#{repo_name}/#{snapshot_name}"
+  defp _make_base_path(repo_name, snapshot_name), do: "/_snapshot/#{repo_name}/#{snapshot_name}"
 
   defp _add_query_params(path, query_params) do
     query_string =
-      query_params
-      |> Enum.map_join("&", fn param ->
+      Enum.map_join(query_params, "&", fn param ->
         "#{elem(param, 0)}=#{elem(param, 1)}"
       end)
 

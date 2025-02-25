@@ -1,8 +1,9 @@
 defmodule Elastix.BulkTest do
   use ExUnit.Case
-  alias Elastix.Index
+
   alias Elastix.Bulk
   alias Elastix.Document
+  alias Elastix.Index
 
   @test_url Elastix.config(:test_url)
   @test_index Elastix.config(:test_index)

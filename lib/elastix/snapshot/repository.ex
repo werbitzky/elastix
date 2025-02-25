@@ -6,13 +6,15 @@ defmodule Elastix.Snapshot.Repository do
   """
 
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.{HTTP, JSON}
+
+  alias Elastix.HTTP
+  alias Elastix.JSON
 
   @doc """
   Registers a repository.
   """
   @spec register(String.t(), String.t(), Map.t(), [tuple()]) ::
-          {:ok, %HTTPoison.Response{}}
+          {:ok, HTTPoison.Response.t()}
   def register(elastic_url, repo_name, data, query_params \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, query_params))
@@ -22,7 +24,7 @@ defmodule Elastix.Snapshot.Repository do
   @doc """
   Verifies a registered but unverified repository.
   """
-  @spec verify(String.t(), String.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec verify(String.t(), String.t()) :: {:ok, HTTPoison.Response.t()}
   def verify(elastic_url, repo_name) do
     elastic_url
     |> prepare_url([make_path(repo_name), "_verify"])
@@ -33,7 +35,7 @@ defmodule Elastix.Snapshot.Repository do
   If repo_name specified, will retrieve information about a registered repository.
   Otherwise, will retrieve information about all repositories.
   """
-  @spec get(String.t(), String.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec get(String.t(), String.t()) :: {:ok, HTTPoison.Response.t()}
   def get(elastic_url, repo_name \\ "_all") do
     elastic_url
     |> prepare_url(make_path(repo_name))
@@ -43,7 +45,7 @@ defmodule Elastix.Snapshot.Repository do
   @doc """
   Removes the reference to the location where the snapshots are stored.
   """
-  @spec delete(String.t(), String.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec delete(String.t(), String.t()) :: {:ok, HTTPoison.Response.t()}
   def delete(elastic_url, repo_name) do
     elastic_url
     |> prepare_url(make_path(repo_name))
@@ -66,8 +68,7 @@ defmodule Elastix.Snapshot.Repository do
 
   defp _add_query_params(path, query_params) do
     query_string =
-      query_params
-      |> Enum.map_join("&", fn param ->
+      Enum.map_join(query_params, "&", fn param ->
         "#{elem(param, 0)}=#{elem(param, 1)}"
       end)
 

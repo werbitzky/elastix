@@ -5,7 +5,9 @@ defmodule Elastix.Document do
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs.html)
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.{HTTP, JSON}
+
+  alias Elastix.HTTP
+  alias Elastix.JSON
 
   @doc """
   (Re)Indexes a document with the given `id`.
@@ -24,7 +26,8 @@ defmodule Elastix.Document do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def index(elastic_url, index_name, type_name, id, data, query_params \\ []) do
-    prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
+    elastic_url
+    |> prepare_url(make_path(index_name, type_name, query_params, id))
     |> HTTP.put(JSON.encode!(data))
   end
 
@@ -44,7 +47,8 @@ defmodule Elastix.Document do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def index_new(elastic_url, index_name, type_name, data, query_params \\ []) do
-    prepare_url(elastic_url, make_path(index_name, type_name, query_params))
+    elastic_url
+    |> prepare_url(make_path(index_name, type_name, query_params))
     |> HTTP.post(JSON.encode!(data))
   end
 
@@ -64,7 +68,8 @@ defmodule Elastix.Document do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def get(elastic_url, index_name, type_name, id, query_params \\ []) do
-    prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
+    elastic_url
+    |> prepare_url(make_path(index_name, type_name, query_params, id))
     |> HTTP.get()
   end
 
@@ -86,7 +91,8 @@ defmodule Elastix.Document do
       |> Enum.join("/")
 
     url =
-      prepare_url(elastic_url, [path, "_mget"])
+      elastic_url
+      |> prepare_url([path, "_mget"])
       |> HTTP.append_query_string(query_params)
 
     # HTTPoison does not provide an API for a GET request with a body.
@@ -109,7 +115,8 @@ defmodule Elastix.Document do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def delete(elastic_url, index_name, type_name, id, query_params \\ []) do
-    prepare_url(elastic_url, make_path(index_name, type_name, query_params, id))
+    elastic_url
+    |> prepare_url(make_path(index_name, type_name, query_params, id))
     |> HTTP.delete()
   end
 
@@ -124,7 +131,8 @@ defmodule Elastix.Document do
           query_params :: Keyword.t()
         ) :: HTTP.resp()
   def delete_matching(elastic_url, index_name, %{} = query, query_params \\ []) do
-    prepare_url(elastic_url, [index_name, "_delete_by_query"])
+    elastic_url
+    |> prepare_url([index_name, "_delete_by_query"])
     |> HTTP.append_query_string(query_params)
     |> HTTP.post(JSON.encode!(query))
   end
@@ -181,13 +189,11 @@ defmodule Elastix.Document do
 
   @doc false
   def make_path(index_name, type_name, query_params) do
-    "/#{index_name}/#{type_name}"
-    |> HTTP.append_query_string(query_params)
+    HTTP.append_query_string("/#{index_name}/#{type_name}", query_params)
   end
 
   @doc false
   def make_path(index_name, type_name, query_params, id, suffix \\ nil) do
-    "/#{index_name}/#{type_name}/#{id}/#{suffix}"
-    |> HTTP.append_query_string(query_params)
+    HTTP.append_query_string("/#{index_name}/#{type_name}/#{id}/#{suffix}", query_params)
   end
 end

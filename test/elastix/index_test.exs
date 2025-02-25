@@ -1,5 +1,6 @@
 defmodule Elastix.IndexTest do
   use ExUnit.Case
+
   alias Elastix.Index
 
   @test_url Elastix.config(:test_url)

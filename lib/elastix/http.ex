@@ -3,12 +3,13 @@ defmodule Elastix.HTTP do
   A thin [HTTPoison](https://github.com/edgurgel/httpoison) wrapper.
   """
   use HTTPoison.Base
+
   alias Elastix.JSON
 
   @type resp :: {:ok, HTTPoison.Response.t()} | {:error, HTTPoison.Error.t()}
 
   @doc false
-  def prepare_url(url, path) when is_binary(path), do: URI.merge(url, path) |> to_string
+  def prepare_url(url, path) when is_binary(path), do: url |> URI.merge(path) |> to_string()
   def prepare_url(url, parts) when is_list(parts), do: prepare_url(url, Path.join(parts))
 
   @doc false
@@ -25,8 +26,8 @@ defmodule Elastix.HTTP do
 
     full_headers =
       headers
-      |> add_content_type_header
-      |> add_shield_header
+      |> add_content_type_header()
+      |> add_shield_header()
       |> add_custom_headers(method, full_url, body)
 
     options = Keyword.merge(default_httpoison_options(), options)
@@ -54,7 +55,7 @@ defmodule Elastix.HTTP do
   def process_response_body(""), do: ""
 
   def process_response_body(body) do
-    case body |> to_string |> JSON.decode() do
+    case body |> to_string() |> JSON.decode() do
       {:error, _} -> body
       {:ok, decoded} -> decoded
     end
