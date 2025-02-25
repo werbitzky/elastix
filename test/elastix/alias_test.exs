@@ -1,5 +1,6 @@
 defmodule Elastix.AliasTest do
   use ExUnit.Case
+
   alias Elastix.Alias
   alias Elastix.Index
 

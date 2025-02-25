@@ -1,14 +1,4 @@
 defmodule Elastix.JSON do
-  defmodule Codec do
-    @moduledoc """
-    A behaviour for JSON serialization.
-    """
-
-    @callback encode!(data :: any) :: iodata
-
-    @callback decode(json :: iodata, opts :: []) :: {:ok, any} | {:error, :invalid}
-  end
-
   @moduledoc """
   A wrapper for JSON libraries with Poison as the default implementation.
 
@@ -34,6 +24,16 @@ defmodule Elastix.JSON do
     json_options: [:return_maps]
   ```
   """
+
+  defmodule Codec do
+    @moduledoc """
+    A behaviour for JSON serialization.
+    """
+
+    @callback encode!(data :: any) :: iodata
+
+    @callback decode(json :: iodata, opts :: []) :: {:ok, any} | {:error, :invalid}
+  end
 
   @doc false
   def encode!(data) do

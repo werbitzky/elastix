@@ -1,8 +1,9 @@
 defmodule Elastix.SearchTest do
   use ExUnit.Case
-  alias Elastix.Search
-  alias Elastix.Index
+
   alias Elastix.Document
+  alias Elastix.Index
+  alias Elastix.Search
   alias HTTPoison.Response
 
   @test_url Elastix.config(:test_url)
@@ -110,7 +111,7 @@ defmodule Elastix.SearchTest do
     {:ok, %Response{body: body}} =
       Search.scroll(@test_url, %{scroll: "1m", scroll_id: body["_scroll_id"]})
 
-    assert length(body["hits"]["hits"]) === 0
+    assert body["hits"]["hits"] == []
   end
 
   test "count should return with status 200" do

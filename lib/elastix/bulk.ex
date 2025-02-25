@@ -5,7 +5,9 @@ defmodule Elastix.Bulk do
   [Elastic documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html)
   """
   import Elastix.HTTP, only: [prepare_url: 2]
-  alias Elastix.{HTTP, JSON}
+
+  alias Elastix.HTTP
+  alias Elastix.JSON
 
   @doc """
   Excepts a list of actions and sources for the `lines` parameter.
@@ -15,20 +17,17 @@ defmodule Elastix.Bulk do
       iex> Elastix.Bulk.post("http://localhost:9200", [%{index: %{_id: "1"}}, %{user: "kimchy"}], index: "twitter", type: "tweet")
       {:ok, %HTTPoison.Response{...}}
   """
-  @spec post(
-          elastic_url :: String.t(),
-          lines :: list,
-          opts :: Keyword.t(),
-          query_params :: Keyword.t()
-        ) :: HTTP.resp()
+  @spec post(elastic_url :: String.t(), lines :: list, opts :: Keyword.t(), query_params :: Keyword.t()) :: HTTP.resp()
   def post(elastic_url, lines, options \\ [], query_params \\ []) do
     data =
-      Enum.reduce(lines, [], fn l, acc -> ["\n", JSON.encode!(l) | acc] end)
+      lines
+      |> Enum.reduce([], fn l, acc -> ["\n", JSON.encode!(l) | acc] end)
       |> Enum.reverse()
       |> IO.iodata_to_binary()
 
     path =
-      Keyword.get(options, :index)
+      options
+      |> Keyword.get(:index)
       |> make_path(Keyword.get(options, :type), query_params)
 
     httpoison_options = Keyword.get(options, :httpoison_options, [])
@@ -41,22 +40,15 @@ defmodule Elastix.Bulk do
   @doc """
   Deprecated: use `post/4` instead.
   """
-  @spec post_to_iolist(
-          elastic_url :: String.t(),
-          lines :: list,
-          opts :: Keyword.t(),
-          query_params :: Keyword.t()
-        ) :: HTTP.resp()
+  @spec post_to_iolist(elastic_url :: String.t(), lines :: list, opts :: Keyword.t(), query_params :: Keyword.t()) ::
+          HTTP.resp()
   def post_to_iolist(elastic_url, lines, options \\ [], query_params \\ []) do
-    IO.warn(
-      "This function is deprecated and will be removed in future releases; use Elastix.Bulk.post/4 instead."
-    )
+    IO.warn("This function is deprecated and will be removed in future releases; use Elastix.Bulk.post/4 instead.")
 
     httpoison_options = Keyword.get(options, :httpoison_options, [])
 
-    (elastic_url <>
-       make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params))
-    |> HTTP.put(
+    HTTP.put(
+      elastic_url <> make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params),
       Enum.map(lines, fn line -> JSON.encode!(line) <> "\n" end),
       [],
       httpoison_options
@@ -67,18 +59,17 @@ defmodule Elastix.Bulk do
   Same as `post/4` but instead of sending a list of maps you must send raw binary data in
   the format described in the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html).
   """
-  @spec post_raw(
-          elastic_url :: String.t(),
-          raw_data :: String.t(),
-          opts :: Keyword.t(),
-          query_params :: Keyword.t()
-        ) :: HTTP.resp()
+  @spec post_raw(elastic_url :: String.t(), raw_data :: String.t(), opts :: Keyword.t(), query_params :: Keyword.t()) ::
+          HTTP.resp()
   def post_raw(elastic_url, raw_data, options \\ [], query_params \\ []) do
     httpoison_options = Keyword.get(options, :httpoison_options, [])
 
-    (elastic_url <>
-       make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params))
-    |> HTTP.put(raw_data, [], httpoison_options)
+    HTTP.put(
+      elastic_url <> make_path(Keyword.get(options, :index), Keyword.get(options, :type), query_params),
+      raw_data,
+      [],
+      httpoison_options
+    )
   end
 
   @doc false

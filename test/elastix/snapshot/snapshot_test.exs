@@ -12,8 +12,10 @@ defmodule Elastix.Snapshot.SnapshotTest do
 
   use ExUnit.Case
   use Retry
+
   alias Elastix.Index
-  alias Elastix.Snapshot.{Repository, Snapshot}
+  alias Elastix.Snapshot.Repository
+  alias Elastix.Snapshot.Snapshot
 
   @test_url Elastix.config(:test_url)
   @test_repository "elastix_test_repository"
@@ -81,7 +83,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
         wait_for_completion: true
       )
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{body: %{"snapshots" => snapshots}}} =
           Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_2")
 
@@ -107,7 +109,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
         wait_for_completion: true
       )
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{body: %{"snapshots" => snapshots}}} =
           Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_1")
 
@@ -135,7 +137,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
         wait_for_completion: true
       )
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{body: %{"snapshots" => snapshots}}} =
           Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_4")
 
@@ -149,7 +151,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
           Index.delete(@test_url, "elastix_test_index_2")
       end
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_1")
         {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_2")
       after
@@ -159,7 +161,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
           })
       end
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_1")
         {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_2")
       end
@@ -174,7 +176,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
         wait_for_completion: true
       )
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{status_code: 200, body: %{"snapshots" => snapshots}}} =
           Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_3")
 
@@ -188,7 +190,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
           Index.delete(@test_url, "elastix_test_index_4")
       end
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_3")
         {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_4")
       after
@@ -198,7 +200,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
           })
       end
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{status_code: 200}} = Index.get(@test_url, "elastix_test_index_3")
         {:ok, %{status_code: 404}} = Index.get(@test_url, "elastix_test_index_4")
       end
@@ -224,7 +226,7 @@ defmodule Elastix.Snapshot.SnapshotTest do
         indices: "elastix_test_index_5"
       })
 
-      wait linear_backoff(500, 1) |> expiry(5_000) do
+      wait 500 |> linear_backoff(1) |> expiry(5_000) do
         {:ok, %{status_code: 200}} =
           Snapshot.status(@test_url, @test_repository, "elastix_test_snapshot_5")
       end

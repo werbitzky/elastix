@@ -1,5 +1,6 @@
 defmodule Elastix.HTTPTest do
   use ExUnit.Case
+
   alias Elastix.HTTP
 
   @test_url Elastix.config(:test_url)
@@ -35,7 +36,7 @@ defmodule Elastix.HTTPTest do
   end
 
   test "process_response_body should parse the json body into a map" do
-    body = "{\"some\":\"json\"}"
+    body = ~s({"some":"json"})
     assert HTTP.process_response_body(body) == %{"some" => "json"}
   end
 
