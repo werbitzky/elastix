@@ -47,21 +47,10 @@ defmodule Elastix.JSON do
 
   @doc false
   defp json_options do
-    # Support :poison_options config for backward-compatibility
-    case Elastix.config(:poison_options) do
-      nil ->
-        Elastix.config(:json_options, [])
-
-      opts ->
-        IO.warn(
-          "Using :poison_options is deprecated and might not work in future releases; use :json_options instead."
-        )
-
-        opts
-    end
+    Elastix.config(:json_options, [])
   end
 
   defp codec do
-    Elastix.config(:json_codec, Poison)
+    Elastix.config(:json_codec, Jason)
   end
 end

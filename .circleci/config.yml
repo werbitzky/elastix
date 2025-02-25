@@ -31,6 +31,7 @@ jobs:
         environment:
           - discovery.type=single-node
           - xpack.security.enabled=false
+          - path.repo=/tmp
 
   "elasticsearch-5.5":
     <<: *shared
@@ -57,7 +58,6 @@ jobs:
       - image: docker.elastic.co/elasticsearch/elasticsearch:5.3.3
         environment:
           - xpack.security.enabled=false
-
 
 workflows:
   version: 2

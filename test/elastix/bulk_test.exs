@@ -29,13 +29,18 @@ defmodule Elastix.BulkTest do
 
   test "bulk accepts httpoison options" do
     lines = [
-        %{index: %{_id: "1"}},
-        %{field: "value1"},
-        %{index: %{_id: "2"}},
-        %{field: "value2"}
-      ]
+      %{index: %{_id: "1"}},
+      %{field: "value1"},
+      %{index: %{_id: "2"}},
+      %{field: "value2"}
+    ]
+
     {:error, %HTTPoison.Error{reason: :timeout}} =
-      Bulk.post @test_url, lines, index: @test_index, type: "message", httpoison_options: [recv_timeout: 0]
+      Bulk.post(@test_url, lines,
+        index: @test_index,
+        type: "message",
+        httpoison_options: [recv_timeout: 0]
+      )
   end
 
   describe "test bulks with index and type in URL" do
@@ -65,7 +70,7 @@ defmodule Elastix.BulkTest do
       {:ok, response} =
         Bulk.post_raw(
           @test_url,
-          Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end),
+          Enum.map(lines, fn line -> Jason.encode!(line) <> "\n" end),
           index: @test_index,
           type: "message"
         )
@@ -120,7 +125,7 @@ defmodule Elastix.BulkTest do
       {:ok, response} =
         Bulk.post_raw(
           @test_url,
-          Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end),
+          Enum.map(lines, fn line -> Jason.encode!(line) <> "\n" end),
           index: @test_index
         )
 
@@ -173,7 +178,7 @@ defmodule Elastix.BulkTest do
       {:ok, response} =
         Bulk.post_raw(
           @test_url,
-          Enum.map(lines, fn line -> Poison.encode!(line) <> "\n" end)
+          Enum.map(lines, fn line -> Jason.encode!(line) <> "\n" end)
         )
 
       assert response.status_code == 200

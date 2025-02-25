@@ -13,7 +13,14 @@ defmodule Elastix.Snapshot.Snapshot do
   """
   @spec create(String.t(), String.t(), String.t(), Map.t(), [tuple()], Keyword.t()) ::
           {:ok, %HTTPoison.Response{}}
-  def create(elastic_url, repo_name, snapshot_name, data \\ %{}, query_params \\ [], options \\ []) do
+  def create(
+        elastic_url,
+        repo_name,
+        snapshot_name,
+        data \\ %{},
+        query_params \\ [],
+        options \\ []
+      ) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name, query_params))
     |> HTTP.put(JSON.encode!(data), [], _make_httpoison_options(options))
@@ -35,7 +42,8 @@ defmodule Elastix.Snapshot.Snapshot do
   snapsot. If repo_name is specified, will retrieve the status of all snapshots
   in that repository. Otherwise, will retrieve the status of all snapshots.
   """
-  @spec status(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec status(String.t(), String.t(), String.t(), Keyword.t()) ::
+          {:ok, %HTTPoison.Response{}}
   def status(elastic_url, repo_name \\ "", snapshot_name \\ "", options \\ []) do
     elastic_url
     |> prepare_url([make_path(repo_name, snapshot_name), "_status"])
@@ -48,7 +56,8 @@ defmodule Elastix.Snapshot.Snapshot do
   all snapshots in that repository. Otherwise, will retrieve information about
   all snapshots.
   """
-  @spec get(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec get(String.t(), String.t(), String.t(), Keyword.t()) ::
+          {:ok, %HTTPoison.Response{}}
   def get(elastic_url, repo_name \\ "", snapshot_name \\ "_all", options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name))
@@ -69,7 +78,8 @@ defmodule Elastix.Snapshot.Snapshot do
       {:ok, %HTTPoison.Response{...}}
 
   """
-  @spec delete(String.t(), String.t(), String.t(), Keyword.t()) :: {:ok, %HTTPoison.Response{}}
+  @spec delete(String.t(), String.t(), String.t(), Keyword.t()) ::
+          {:ok, %HTTPoison.Response{}}
   def delete(elastic_url, repo_name, snapshot_name, options \\ []) do
     elastic_url
     |> prepare_url(make_path(repo_name, snapshot_name))

@@ -44,13 +44,6 @@ defmodule Elastix.HTTPTest do
     assert HTTP.process_response_body(body) == body
   end
 
-  test "process_response_body parsed the body into an atom key map if configured" do
-    body = "{\"some\":\"json\"}"
-    Application.put_env(:elastix, :poison_options, keys: :atoms)
-    assert HTTP.process_response_body(body) == %{some: "json"}
-    Application.delete_env(:elastix, :poison_options)
-  end
-
   test "adding custom headers" do
     Application.put_env(
       :elastix,
